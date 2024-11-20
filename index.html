@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia Empire Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #222;
+            color: white;
+            padding: 20px;
+        }
+
+        #game-container {
+            display: none;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .customize-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Welcome to Mafia Empire Simulator</h1>
+
+    <!-- Customization Form -->
+    <div id="customization-container">
+        <h2>Create Your Character</h2>
+        <div class="input-group">
+            <label for="player-name">Enter Your Mafia Boss Name:</label><br>
+            <input type="text" id="player-name" placeholder="Enter your name here" required>
+        </div>
+
+        <div class="input-group">
+            <label for="hair-color">Choose Hair Color:</label><br>
+            <select id="hair-color">
+                <option value="Black">Black</option>
+                <option value="Brown">Brown</option>
+                <option value="Blonde">Blonde</option>
+                <option value="Red">Red</option>
+                <option value="Gray">Gray</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="clothing">Choose Clothing Style:</label><br>
+            <select id="clothing">
+                <option value="Suit">Suit</option>
+                <option value="Casual">Casual</option>
+                <option value="Streetwear">Streetwear</option>
+                <option value="Gangster">Gangster</option>
+            </select>
+        </div>
+
+        <button class="button" onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container">
+        <h2>Welcome, <span id="character-name">Mafia Boss</span></h2>
+        <p>Your current assets: $<span id="money">0</span></p>
+        <button class="button" onclick="collectMoney()">Collect Money</button>
+        <button class="button" onclick="upgradeEmpire()">Upgrade Empire</button>
+        <button class="button" onclick="viewProfile()">View Profile</button>
+    </div>
+
+    <script>
+        let money = 0;
+        let playerName = '';
+        let hairColor = '';
+        let clothing = '';
+
+        // Start game and initialize customization
+        function startGame() {
+            playerName = document.getElementById('player-name').value;
+            hairColor = document.getElementById('hair-color').value;
+            clothing = document.getElementById('clothing').value;
+
+            if (playerName === "") {
+                alert("Please enter your name to continue.");
+                return;
+            }
+
+            // Hide customization screen and show game
+            document.getElementById('customization-container').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+
+            // Update character name and info
+            document.getElementById('character-name').textContent = playerName;
+            document.getElementById('character-name').style.color = hairColor.toLowerCase();
+        }
+
+        // Collect money action
+        function collectMoney() {
+            money += 100; // Each collection adds $100
+            document.getElementById('money').textContent = money;
+        }
+
+        // Upgrade empire action
+        function upgradeEmpire() {
+            if (money >= 1000) {
+                money -= 1000;
+                alert("Your empire has been upgraded!");
+                document.getElementById('money').textContent = money;
+            } else {
+                alert("You don't have enough money to upgrade the empire.");
+            }
+        }
+
+        // View character profile
+        function viewProfile() {
+            alert("Mafia Boss: " + playerName + "\nHair Color: " + hairColor + "\nClothing: " + clothing + "\nMoney: $" + money);
+        }
+    </script>
+
+</body>
+</html>
