@@ -163,6 +163,7 @@
             playerName = document.getElementById('player-name').value;
             gangName = document.getElementById('gang-name').value;
 
+            // Check if both names are filled
             if (!playerName || !gangName) {
                 alert("Please enter your name and gang's name to continue.");
                 return;
@@ -171,10 +172,10 @@
             document.getElementById('customization-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'block';
 
+            // Display player's name and gang name
             document.getElementById('character-name').textContent = playerName;
             document.getElementById('gang-name-display').textContent = gangName;
-
-            saveGame();
+            updateStats();
         }
 
         // Collect Money
@@ -234,4 +235,3 @@
         function openBusiness() {
             if (money >= 3000) {
                 money -= 3000;
-                businesses
