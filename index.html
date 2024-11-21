@@ -37,8 +37,13 @@
             background-color: #45a049;
         }
 
-        .customize-container {
+        #gang-recruitment, #rival-gangs, #character-stats, #tapper-system, #business-upgrades, #money-laundering {
+            display: none;
+        }
+
+        .stats {
             margin-top: 20px;
+            text-align: left;
         }
     </style>
 </head>
@@ -48,31 +53,15 @@
 
     <!-- Customization Form -->
     <div id="customization-container">
-        <h2>Create Your Character</h2>
+        <h2>Create Your Mafia Empire</h2>
         <div class="input-group">
             <label for="player-name">Enter Your Mafia Boss Name:</label><br>
             <input type="text" id="player-name" placeholder="Enter your name here" required>
         </div>
 
         <div class="input-group">
-            <label for="hair-color">Choose Hair Color:</label><br>
-            <select id="hair-color">
-                <option value="Black">Black</option>
-                <option value="Brown">Brown</option>
-                <option value="Blonde">Blonde</option>
-                <option value="Red">Red</option>
-                <option value="Gray">Gray</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label for="clothing">Choose Clothing Style:</label><br>
-            <select id="clothing">
-                <option value="Suit">Suit</option>
-                <option value="Casual">Casual</option>
-                <option value="Streetwear">Streetwear</option>
-                <option value="Gangster">Gangster</option>
-            </select>
+            <label for="gang-name">Enter Your Gang Name:</label><br>
+            <input type="text" id="gang-name" placeholder="Enter your gang's name here" required>
         </div>
 
         <button class="button" onclick="startGame()">Start Game</button>
@@ -81,60 +70,168 @@
     <!-- Game Container -->
     <div id="game-container">
         <h2>Welcome, <span id="character-name">Mafia Boss</span></h2>
+        <p>Your Gang: <span id="gang-name-display"></span></p>
         <p>Your current assets: $<span id="money">0</span></p>
         <button class="button" onclick="collectMoney()">Collect Money</button>
-        <button class="button" onclick="upgradeEmpire()">Upgrade Empire</button>
-        <button class="button" onclick="viewProfile()">View Profile</button>
+        <button class="button" onclick="showEmpireUpgrades()">Upgrade Empire</button>
+        <button class="button" onclick="showRecruitment()">Recruit Members</button>
+        <button class="button" onclick="viewRivalGangs()">View Rival Gangs</button>
+        <button class="button" onclick="viewStats()">View Stats</button>
+        <button class="button" onclick="startTapping()">Start Tapping</button>
+        <button class="button" onclick="saveGame()">Save Game</button>
+
+        <!-- Gang Recruitment -->
+        <div id="gang-recruitment">
+            <h3>Recruit Members Off the Streets</h3>
+            <p>Each recruit has stats that can improve your gang.</p>
+            <button class="button" onclick="recruitMember()">Recruit Member</button>
+            <p>Your Gang Members: <span id="gang-members">0</span></p>
+        </div>
+
+        <!-- Rival Gangs -->
+        <div id="rival-gangs">
+            <h3>Rival Gangs</h3>
+            <p>See where rival gangs are located on the map:</p>
+            <ul>
+                <li>Gang A: New York</li>
+                <li>Gang B: Los Angeles</li>
+                <li>Gang C: Chicago</li>
+                <li>Gang D: Miami</li>
+            </ul>
+        </div>
+
+        <!-- Character Stats -->
+        <div id="character-stats">
+            <h3>Your Character Stats</h3>
+            <p>Happiness: <span id="happiness">100</span></p>
+            <p>Sadness: <span id="sadness">0</span></p>
+            <p>Fitness: <span id="fitness">100</span></p>
+        </div>
+
+        <!-- Tapping System -->
+        <div id="tapper-system">
+            <h3>Tap for Money!</h3>
+            <button class="button" onclick="tapForMoney()">Tap!</button>
+            <p>Money Earned by Tapping: $<span id="tapper-money">0</span></p>
+        </div>
+
+        <!-- Business Upgrades -->
+        <div id="business-upgrades">
+            <h3>Empire Upgrades</h3>
+            <button class="button" onclick="openBusiness()">Open a Business</button>
+            <button class="button" onclick="upgradeWeapons()">Upgrade Weapons</button>
+            <button class="button" onclick="controlTerritories()">Control Territories</button>
+            <button class="button" onclick="sellDrugs()">Sell Drugs</button>
+        </div>
+
+        <!-- Money Laundering -->
+        <div id="money-laundering">
+            <h3>Money Laundering</h3>
+            <p>Use your illegal profits to launder money and protect your assets.</p>
+            <button class="button" onclick="launderMoney()">Launder Money</button>
+        </div>
+
+        <div class="stats" id="stats" style="display:none;">
+            <h3>Your Empire Stats</h3>
+            <p>Weapons Level: <span id="weapons-level">0</span></p>
+            <p>Territories Controlled: <span id="territories-level">0</span></p>
+            <p>Businesses Owned: <span id="businesses-level">0</span></p>
+            <p>Drugs Sold: <span id="drugs-sold">0</span> units</p>
+            <p>Laundered Money: $<span id="laundered-money">0</span></p>
+        </div>
     </div>
 
     <script>
         let money = 0;
         let playerName = '';
-        let hairColor = '';
-        let clothing = '';
+        let gangName = '';
+        let happiness = 100;
+        let sadness = 0;
+        let fitness = 100;
+        let gangMembers = 0;
+        let weaponsLevel = 0;
+        let territoriesLevel = 0;
+        let businessesLevel = 0;
+        let drugPrice = 100;
+        let drugStock = 0;
+        let drugsSold = 0;
+        let tapperMoney = 0;
+        let launderedMoney = 0;
 
-        // Start game and initialize customization
+        // Start Game
         function startGame() {
             playerName = document.getElementById('player-name').value;
-            hairColor = document.getElementById('hair-color').value;
-            clothing = document.getElementById('clothing').value;
+            gangName = document.getElementById('gang-name').value;
 
-            if (playerName === "") {
-                alert("Please enter your name to continue.");
+            if (!playerName || !gangName) {
+                alert("Please enter your name and gang's name to continue.");
                 return;
             }
 
-            // Hide customization screen and show game
             document.getElementById('customization-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'block';
 
-            // Update character name and info
             document.getElementById('character-name').textContent = playerName;
-            document.getElementById('character-name').style.color = hairColor.toLowerCase();
+            document.getElementById('gang-name-display').textContent = gangName;
+
+            saveGame();
         }
 
-        // Collect money action
+        // Collect Money
         function collectMoney() {
-            money += 100; // Each collection adds $100
+            money += 100;
             document.getElementById('money').textContent = money;
+            happiness -= 2; // Decrease happiness for work
+            sadness += 1; // Increase sadness from work
+            updateStats();
         }
 
-        // Upgrade empire action
-        function upgradeEmpire() {
-            if (money >= 1000) {
-                money -= 1000;
-                alert("Your empire has been upgraded!");
-                document.getElementById('money').textContent = money;
+        // Recruit Gang Members
+        function showRecruitment() {
+            document.getElementById('gang-recruitment').style.display = 'block';
+        }
+
+        function recruitMember() {
+            let recruitCost = 500;
+            if (money >= recruitCost) {
+                money -= recruitCost;
+                gangMembers++;
+                alert('You have recruited a new member!');
+                document.getElementById('gang-members').textContent = gangMembers;
+                updateStats();
             } else {
-                alert("You don't have enough money to upgrade the empire.");
+                alert('Not enough money to recruit!');
             }
         }
 
-        // View character profile
-        function viewProfile() {
-            alert("Mafia Boss: " + playerName + "\nHair Color: " + hairColor + "\nClothing: " + clothing + "\nMoney: $" + money);
+        // Rival Gangs View
+        function viewRivalGangs() {
+            document.getElementById('rival-gangs').style.display = 'block';
         }
-    </script>
 
-</body>
-</html>
+        // View Character Stats
+        function updateStats() {
+            document.getElementById('happiness').textContent = happiness;
+            document.getElementById('sadness').textContent = sadness;
+            document.getElementById('fitness').textContent = fitness;
+        }
+
+        // Start Tapping System
+        function startTapping() {
+            document.getElementById('tapper-system').style.display = 'block';
+        }
+
+        function tapForMoney() {
+            tapperMoney += 10; // Earn money per tap
+            money += 10;
+            document.getElementById('tapper-money').textContent = tapperMoney;
+            happiness += 1; // Increase happiness from tapping
+            sadness -= 1; // Decrease sadness from tapping
+            updateStats();
+        }
+
+        // Business Upgrades
+        function openBusiness() {
+            if (money >= 3000) {
+                money -= 3000;
+                businesses
