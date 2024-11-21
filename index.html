@@ -130,6 +130,20 @@
             margin-top: 5px;
             font-size: 14px;
         }
+
+        .happiness-bar {
+            background-color: #ddd;
+            width: 100%;
+            height: 20px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .happiness {
+            height: 100%;
+            border-radius: 5px;
+        }
+
     </style>
 </head>
 <body>
@@ -172,6 +186,7 @@
             <button onclick="collectMoney()">Collect Money</button>
             <button onclick="saveGame()">Save Game</button>
             <button onclick="recruitMember()">Recruit Member</button>
+            <button onclick="attackRival()">Attack Rival Gang</button>
         </div>
 
         <div class="stats">
@@ -197,6 +212,11 @@
                 <button onclick="attackRival('Rival Gang 3')">Attack</button>
             </div>
         </div>
+
+        <!-- Happiness Bar -->
+        <div class="happiness-bar">
+            <div class="happiness" id="happiness-bar"></div>
+        </div>
     </div>
 
     <script>
@@ -204,6 +224,7 @@
         let gangMembers = 0;
         let playerName = '';
         let gangName = '';
+        let happiness = 100;
         let savedGames = JSON.parse(localStorage.getItem('savedGames')) || {};
 
         function startGame() {
@@ -220,12 +241,16 @@
                 playerName: playerName,
                 gangName: gangName,
                 money: money,
-                gangMembers: gangMembers
+                gangMembers: gangMembers,
+                happiness: happiness
             };
             localStorage.setItem('savedGames', JSON.stringify(savedGames));
 
+            // Hide customization screen and show the game container
             document.getElementById('customization-container').style.display = 'none';
             document.getElementById('game-container').style.display = 'block';
+
+            // Update character name and gang name
             document.getElementById('character-name').textContent = playerName;
             document.getElementById('gang-name-display').textContent = gangName;
 
@@ -236,11 +261,13 @@
             document.getElementById('money').textContent = money;
             document.getElementById('gang-members').textContent = gangMembers;
             document.getElementById('money-earned').textContent = money;
+            document.getElementById('happiness-bar').style.width = happiness + '%';
         }
 
         function collectMoney() {
             money += 100;
             gangMembers++;
+            happiness = Math.min(100, happiness + 5); // Increase happiness slightly each time
             updateStats();
         }
 
@@ -249,7 +276,8 @@
                 playerName: playerName,
                 gangName: gangName,
                 money: money,
-                gangMembers: gangMembers
+                gangMembers: gangMembers,
+                happiness: happiness
             };
             localStorage.setItem('savedGames', JSON.stringify(savedGames));
             alert("Game saved!");
@@ -264,10 +292,11 @@
                 const gameData = savedGames[gang];
                 const gameEntry = document.createElement('div');
                 gameEntry.classList.add('game-entry');
-                gameEntry.innerHTML = `
-                    <p>Gang Name: ${gameData.gangName}</p>
-                    <p>Boss Name: ${gameData.playerName}</p>
-                    <button onclick="loadGame('${gang}')">Load</button>
+                gameEntry.innerHTML
+                                gameEntry.innerHTML = `
+                    <h4>${gameData.gangName}</h4>
+                    <p>Mafia Boss: ${gameData.playerName}</p>
+                    <button onclick="loadGame('${gang}')">Load Game</button>
                 `;
                 savedGameList.appendChild(gameEntry);
             }
@@ -275,81 +304,39 @@
 
         function loadGame(gang) {
             const gameData = savedGames[gang];
-
             playerName = gameData.playerName;
             gangName = gameData.gangName;
             money = gameData.money;
             gangMembers = gameData.gangMembers;
+            happiness = gameData.happiness;
 
-            document.getElementById('saved-games').style.display = 'none';
             document.getElementById('customization-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block
+            document.getElementById('saved-games').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+
             document.getElementById('character-name').textContent = playerName;
             document.getElementById('gang-name-display').textContent = gangName;
-
             updateStats();
         }
 
         function recruitMember() {
-            if (money >= 500) {
-                gangMembers++;
-                money -= 500; // Cost to recruit a member
-                updateStats();
-                alert("A new gang member has joined!");
-            } else {
-                alert("You don't have enough money to recruit a new member.");
-            }
-        }
-
-        function attackRival(rivalName) {
-            const attackSuccess = Math.random() > 0.5; // 50% chance to win the attack
-            if (attackSuccess) {
-                const reward = Math.floor(Math.random() * 1000) + 500;
-                money += reward;
-                updateStats();
-                alert(`You successfully attacked ${rivalName} and earned $${reward}!`);
-            } else {
-                alert(`Your attack on ${rivalName} failed.`);
-            }
-        }
-
-        // Function to show the current saved games in the front screen
-        function loadSavedGames() {
-            document.getElementById('saved-games').style.display = 'block';
-            const savedGameList = document.getElementById('saved-game-list');
-            savedGameList.innerHTML = '';
-
-            for (let gang in savedGames) {
-                const gameData = savedGames[gang];
-                const gameEntry = document.createElement('div');
-                gameEntry.classList.add('game-entry');
-                gameEntry.innerHTML = `
-                    <p>Gang Name: ${gameData.gangName}</p>
-                    <p>Boss Name: ${gameData.playerName}</p>
-                    <button onclick="loadGame('${gang}')">Load</button>
-                `;
-                savedGameList.appendChild(gameEntry);
-            }
-        }
-
-        function loadGame(gang) {
-            const gameData = savedGames[gang];
-
-            playerName = gameData.playerName;
-            gangName = gameData.gangName;
-            money = gameData.money;
-            gangMembers = gameData.gangMembers;
-
-            document.getElementById('saved-games').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block';
-            document.getElementById('customization-container').style.display = 'none';
-
-            document.getElementById('character-name').textContent = playerName;
-            document.getElementById('gang-name-display').textContent = gangName;
-
+            gangMembers++;
+            happiness = Math.min(100, happiness + 3); // Increase happiness with recruitment
             updateStats();
         }
 
+        function attackRival(rival) {
+            const success = Math.random() > 0.5; // Random chance of success
+            if (success) {
+                money += 500;
+                alert(`You successfully attacked ${rival} and earned $500!`);
+            } else {
+                money -= 200;
+                happiness = Math.max(0, happiness - 5); // Lose happiness if attack fails
+                alert(`Your attack on ${rival} failed! You lost $200 and some happiness.`);
+            }
+            updateStats();
+        }
     </script>
 
 </body>
