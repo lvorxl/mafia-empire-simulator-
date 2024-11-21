@@ -4,966 +4,185 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mafia Empire Simulator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #222;
-            color: white;
-            padding: 20px;
-        }
-
-        .button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-        }
-
-        .container {
-            margin: 20px auto;
-            width: 80%;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-        
-        .stats {
-            font-size: 18px;
-        }
-        
-        #game-container, #empire-expansion-container, #health-wellbeing-container, #rival-gangs-container {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <h1>Welcome to Mafia Empire Simulator</h1>
-
-    <!-- Customization Form -->
-    <div id="customization-container">
-        <h2>Create Your Character</h2>
-        <div class="input-group">
-            <label for="player-name">Enter Your Mafia Boss Name:</label><br>
-            <input type="text" id="player-name" placeholder="Enter your name here" required>
-        </div>
-
-        <div class="input-group">
-            <label for="hair-color">Choose Hair Color:</label><br>
-            <select id="hair-color">
-                <option value="Black">Black</option>
-                <option value="Brown">Brown</option>
-                <option value="Blonde">Blonde</option>
-                <option value="Red">Red</option>
-                <option value="Gray">Gray</option>
-            </select>
-        </div>
-
-        <div class="input-group">
-            <label for="clothing">Choose Clothing Style:</label><br>
-            <select id="clothing">
-                <option value="Suit">Suit</option>
-                <option value="Casual">Casual</option>
-                <option value="Streetwear">Streetwear</option>
-                <option value="Gangster">Gangster</option>
-            </select>
-        </div>
-
-        <button class="button" onclick="startGame()">Start Game</button>
-    </div>
-
-    <!-- Game Container -->
     <div id="game-container">
-        <h2>Welcome, <span id="character-name">Mafia Boss</span></h2>
-        <p>Your current assets: $<span id="money">0</span></p>
-        <p>Your reputation: <span id="reputation">0</span></p>
-        <p class="stats">Health: <span id="health">100</span>%</p>
-        <p class="stats">Fitness: <span id="fitness">100</span>%</p>
-        <p class="stats">Stress: <span id="stress">0</span>%</p>
-        <p class="stats">Happiness: <span id="happiness">100</span>%</p>
-
-        <button class="button" onclick="collectMoney()">Collect Money</button>
-        <button class="button" onclick="upgradeEmpire()">Upgrade Empire</button>
-        <button class="button" onclick="viewProfile()">View Profile</button>
-        <button class="button" onclick="openEmpireExpansion()">Manage Empire</button>
-        <button class="button" onclick="openRivalGangs()">View Rival Gangs</button>
-        <button class="button" onclick="openHealthManagement()">Manage Health</button>
-    </div>
-
-    <!-- Empire Expansion Section -->
-    <div class="container" id="empire-expansion-container">
-        <h2>Empire Expansion</h2>
-        <button class="button" onclick="buyBusiness()">Buy a Business</button>
-        <button class="button" onclick="viewBusinesses()">View My Businesses</button>
-        <button class="button" onclick="manageRealEstate()">Manage Real Estate</button>
-        <button class="button" onclick="backToGameFromEmpire()">Back to Game</button>
-    </div>
-
-    <div id="businesses-list"></div>
-
-    <!-- Rival Gangs Section -->
-    <div class="container" id="rival-gangs-container">
-        <h2>Rival Gangs</h2>
-        <button class="button" onclick="viewRivalGangs()">View Rival Gangs</button>
-        <button class="button" onclick="initiateGangWar()">Initiate Gang War</button>
-        <button class="button" onclick="backToGameFromRivals()">Back to Game</button>
-    </div>
-
-    <div id="rival-gangs-list"></div>
-
-    <!-- Health Management Section -->
-    <div class="container" id="health-wellbeing-container">
-        <h2>Character Health & Well-Being</h2>
-        <p>Health: <span id="health-stat">100</span>%</p>
-        <p>Fitness: <span id="fitness-stat">100</span>%</p>
-        <p>Stress: <span id="stress-stat">0</span>%</p>
-        <p>Happiness: <span id="happiness-stat">100</span>%</p>
-        <button class="button" onclick="goToGym()">Go to the Gym</button>
-        <button class="button" onclick="relax()">Relax</button>
-        <button class="button" onclick="backToGameFromHealth()">Back to Game</button>
-    </div>
-
-    <script>
-        let money = 0;
-        let reputation = 0;
-        let health = 100;
-        let fitness = 100;
-        let stress = 0;
-        let happiness = 100;
-        let playerName = '';
-        let hairColor = '';
-        let clothing = '';
-        let businesses = [];
-        let rivalGangs = [
-            { name: "The Black Dragons", power: 50, territory: "Downtown" },
-            { name: "The Red Suns", power: 30, territory: "Eastside" },
-            { name: "The Viper Syndicate", power: 40, territory: "West End" },
-        ];
-
-        // Start game
-        function startGame() {
-            playerName = document.getElementById('player-name').value;
-            hairColor = document.getElementById('hair-color').value;
-            clothing = document.getElementById('clothing').value;
-
-            if (playerName === "") {
-                alert("Please enter your name to continue.");
-                return;
-            }
-
-            document.getElementById('customization-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block';
-            document.getElementById('character-name').textContent = playerName;
-            document.getElementById('character-name').style.color = hairColor.toLowerCase();
-            updateStats();
-        }
-
-        // Update stats display
-        function updateStats() {
-            document.getElementById('money').textContent = money;
-            document.getElementById('reputation').textContent = reputation;
-            document.getElementById('health').textContent = health;
-            document.getElementById('fitness').textContent = fitness;
-            document.getElementById('stress').textContent = stress;
-            document.getElementById('happiness').textContent = happiness;
-        }
-
-        // Collect money
-        function collectMoney() {
-            money += 100;
-            updateStats();
-        }
-
-        // Upgrade empire
-        function upgradeEmpire() {
-            if (money >= 1000) {
-                money -= 1000;
-                reputation += 20;
-                alert("Your empire has been upgraded!");
-                updateStats();
-            } else {
-                alert("You don't have enough money to upgrade the empire.");
-            }
-        }
-
-        // View profile
-        function viewProfile() {
-            alert(`Mafia Boss: ${playerName}\nHair Color: ${hairColor}\nClothing: ${clothing}\nMoney: $${money}`);
-        }
-
-        // Empire expansion
-        function openEmpireExpansion() {
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('empire-expansion-container').style.display = 'block';
-        }
-
-        function buyBusiness() {
-            if (money >= 5000) {
-                const business = { name: `Business #${businesses.length + 1}`, type: 'Club', incomePerDay: 100, cost: 5000 };
-                businesses.push(business);
-                money -= business.cost;
-                alert(`You bought a ${business.type} business!`);
-                updateStats();
-            } else {
-                alert("You don't have enough money to buy a business.");
-            }
-        }
-
-        function viewBusinesses() {
-            let businessHtml = `<h3>Your Businesses:</h3><ul>`;
-            businesses.forEach(business => {
-                businessHtml += `<li
-                                businessHtml += `<li>${business.name} (Income: $${business.incomePerDay}/day)</li>`;
-            });
-            businessHtml += `</ul>`;
-            document.getElementById('businesses-list').innerHTML = businessHtml;
-        }
-
-        function manageRealEstate() {
-            if (money >= 10000) {
-                const property = { name: `Property #${realEstate.length + 1}`, value: 10000, rentalIncome: 200 };
-                realEstate.push(property);
-                money -= property.value;
-                alert(`You bought a property!`);
-                updateStats();
-            } else {
-                alert("You don't have enough money to buy real estate.");
-            }
-        }
-
-        function backToGameFromEmpire() {
-            document.getElementById('empire-expansion-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block';
-        }
-
-        // Rival Gangs
-        function openRivalGangs() {
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('rival-gangs-container').style.display = 'block';
-        }
-
-        function viewRivalGangs() {
-            let rivalHtml = `<h3>Rival Gangs:</h3><ul>`;
-            rivalGangs.forEach(gang => {
-                rivalHtml += `<li>${gang.name} (Power: ${gang.power}, Territory: ${gang.territory})</li>`;
-            });
-            rivalHtml += `</ul>`;
-            document.getElementById('rival-gangs-list').innerHTML = rivalHtml;
-        }
-
-        function initiateGangWar() {
-            const rivalGang = rivalGangs[Math.floor(Math.random() * rivalGangs.length)];
-            const gangWarOutcome = Math.random() * 100;
-
-            if (gangWarOutcome < (fitness + reputation) * 0.5) {
-                money += 2000;
-                reputation += 20;
-                alert(`You won the gang war against ${rivalGang.name} and earned $2000!`);
-            } else {
-                money -= 1000;
-                reputation -= 10;
-                alert(`You lost the gang war against ${rivalGang.name} and lost $1000.`);
-            }
-            updateStats();
-        }
-
-        function backToGameFromRivals() {
-            document.getElementById('rival-gangs-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block';
-        }
-
-        // Health Management
-        function openHealthManagement() {
-            document.getElementById('game-container').style.display = 'none';
-            document.getElementById('health-wellbeing-container').style.display = 'block';
-        }
-
-        function goToGym() {
-            fitness += 10;
-            stress -= 5;
-            happiness += 5;
-            health += 2;
-
-            if (fitness > 100) fitness = 100;
-            if (health > 100) health = 100;
-            if (stress < 0) stress = 0;
-            if (happiness > 100) happiness = 100;
-
-            updateHealthStats();
-        }
-
-        function relax() {
-            stress -= 10;
-            happiness += 15;
-
-            if (stress < 0) stress = 0;
-            if (happiness > 100) happiness = 100;
-
-            updateHealthStats();
-        }
-
-        function updateHealthStats() {
-            document.getElementById('health-stat').textContent = health;
-            document.getElementById('fitness-stat').textContent = fitness;
-            document.getElementById('stress-stat').textContent = stress;
-            document.getElementById('happiness-stat').textContent = happiness;
-        }
-
-        function backToGameFromHealth() {
-            document.getElementById('health-wellbeing-container').style.display = 'none';
-            document.getElementById('game-container').style.display = 'block';
-        }
-
-        // Real Estate
-        let realEstate = [];
-
-        // Random Events (Dynamic gameplay)
-        function randomEvent() {
-            const eventOutcome = Math.random();
-            if (eventOutcome < 0.2) {
-                const eventText = "A rival gang attempted to raid your business!";
-                money -= 1500;
-                reputation -= 10;
-                alert(eventText + "\nYou lost $1500 in the raid.");
-            } else if (eventOutcome < 0.4) {
-                const eventText = "You get a surprise investment!";
-                money += 5000;
-                reputation += 15;
-                alert(eventText + "\nYou gained $5000!");
-            } else if (eventOutcome < 0.6) {
-                const eventText = "You got a chance to expand your empire!";
-                money -= 2000;
-                reputation += 10;
-                alert(eventText + "\nYou spent $2000 to expand your empire.");
-            } else {
-                const eventText = "A trusted ally betrays you!";
-                money -= 3000;
-                reputation -= 30;
-                alert(eventText + "\nYou lost $3000 from the betrayal.");
-            }
-
-            updateStats();
-        }
-
-        // Call a random event periodically
-        setInterval(randomEvent, 10000);  // Trigger random event every 10 seconds (for demo)
-
-    </script>
-</body>
-</html>
-        // Add more businesses to the game, including different types of businesses
-        function addBusiness(type) {
-            if (money >= 5000) {
-                const business = {
-                    name: `${type} Business`,
-                    incomePerDay: 1000, 
-                    type: type
-                };
-                businesses.push(business);
-                money -= 5000;
-                alert(`You’ve established a new ${type} business.`);
-                updateBusinessList();
-                updateStats();
-            } else {
-                alert("You don't have enough money to start this business.");
-            }
-        }
-
-        // Upgrade existing business for better income
-        function upgradeBusiness() {
-            const businessIndex = prompt("Which business would you like to upgrade? (Enter index)");
-            const business = businesses[businessIndex];
-            if (business && money >= 3000) {
-                business.incomePerDay *= 1.5; // Increase income by 50%
-                money -= 3000;
-                alert(`Your ${business.type} business has been upgraded.`);
-                updateBusinessList();
-                updateStats();
-            } else if (!business) {
-                alert("Invalid business selection.");
-            } else {
-                alert("You don't have enough money to upgrade this business.");
-            }
-        }
-
-        // View all businesses
-        function viewBusinesses() {
-            let businessHtml = "<h3>Your Businesses:</h3><ul>";
-            businesses.forEach((business, index) => {
-                businessHtml += `<li>(${index + 1}) ${business.name} - Income: $${business.incomePerDay}/day</li>`;
-            });
-            businessHtml += "</ul>";
-            document.getElementById('businesses-list').innerHTML = businessHtml;
-        }
-
-        // Take loan from bank to speed up growth
-        function takeLoan() {
-            if (loanAmount === 0) {
-                loanAmount = 5000;
-                money += loanAmount;
-                alert("You have taken a loan of $5000 from the bank.");
-            } else {
-                alert("You already have a loan. Repay it before taking another one.");
-            }
-        }
-
-        // Repay loan with interest
-        function repayLoan() {
-            const interest = loanAmount * 0.1;
-            const totalRepayment = loanAmount + interest;
-            if (money >= totalRepayment) {
-                money -= totalRepayment;
-                loanAmount = 0;
-                alert("You have successfully repaid your loan with interest.");
-                updateStats();
-            } else {
-                alert("You don't have enough money to repay the loan.");
-            }
-        }
-
-        // Managing Reputation and Mafia Influence
-        function increaseInfluence() {
-            if (reputation >= 50) {
-                mafiaInfluence += 10;
-                reputation -= 50;
-                alert("Your mafia influence has increased!");
-            } else {
-                alert("You need more reputation to increase your influence.");
-            }
-        }
-
-        // Send henchmen to do a job (increase influence or steal money)
-        function sendHenchmen() {
-            const jobType = prompt("What kind of job should the henchmen do? (influence/steal)");
-            if (jobType === "influence") {
-                if (mafiaInfluence >= 10) {
-                    reputation += 10;
-                    mafiaInfluence -= 10;
-                    alert("Henchmen completed the job and increased your reputation.");
-                } else {
-                    alert("Not enough mafia influence to send henchmen.");
-                }
-            } else if (jobType === "steal") {
-                if (mafiaInfluence >= 5) {
-                    const stolenAmount = Math.floor(Math.random() * 3000) + 1000;
-                    money += stolenAmount;
-                    mafiaInfluence -= 5;
-                    alert(`Henchmen stole $${stolenAmount} from a rival business.`);
-                    updateStats();
-                } else {
-                    alert("Not enough mafia influence to send henchmen to steal.");
-                }
-            } else {
-                alert("Invalid job type.");
-            }
-        }
-
-        // Managing Gangs and Crew Members
-        function recruitCrewMember() {
-            if (money >= 1000) {
-                const crewMember = {
-                    name: `Crew Member #${crew.length + 1}`,
-                    skillLevel: Math.floor(Math.random() * 10) + 1,
-                    salary: 500
-                };
-                crew.push(crewMember);
-                money -= 1000;
-                alert(`You have recruited a new crew member: ${crewMember.name}`);
-                updateCrewList();
-                updateStats();
-            } else {
-                alert("You don't have enough money to recruit a crew member.");
-            }
-        }
-
-        function payCrew() {
-            if (money >= crew.length * 500) {
-                money -= crew.length * 500;
-                alert("You paid your crew members' salaries.");
-                updateStats();
-            } else {
-                alert("You don't have enough money to pay your crew.");
-            }
-        }
-
-        function viewCrew() {
-            let crewHtml = "<h3>Your Crew:</h3><ul>";
-            crew.forEach((member, index) => {
-                crewHtml += `<li>${member.name} (Skill: ${member.skillLevel}, Salary: $${member.salary}/week)</li>`;
-            });
-            crewHtml += "</ul>";
-            document.getElementById('crew-list').innerHTML = crewHtml;
-        }
-
-        // Mafia's Global Operations
-        function expandGlobally() {
-            if (mafiaInfluence >= 20) {
-                mafiaInfluence -= 20;
-                alert("Your mafia empire is expanding globally!");
-                // Increase revenue or introduce new areas of the world
-                money += 5000; // Global expansion brings in extra income
-                updateStats();
-            } else {
-                alert("You don't have enough mafia influence to expand globally.");
-            }
-        }
-
-        // ** Update Stats function (for dynamic updates across the UI) **
-        function updateStats() {
-            document.getElementById('money').textContent = `$${money}`;
-            document.getElementById('reputation').textContent = reputation;
-            document.getElementById('mafiaInfluence').textContent = mafiaInfluence;
-            document.getElementById('loanAmount').textContent = loanAmount ? `$${loanAmount}` : "None";
-        }
-
-        // Initialize game with basic values
-        function initializeGame() {
-            money = 5000;
-            reputation = 0;
-            mafiaInfluence = 0;
-            loanAmount = 0;
-            crew = [];
-            businesses = [];
-            realEstate = [];
-        }
-
-        // Trigger game initialization on page load
-        window.onload = function() {
-            initializeGame();
-            updateStats();
-        }
-
-    </script>
-
-</body>
-</html>
-        // Managing Rival Gangs and Factions
-        const rivalGangs = [
-            { name: "The Bloodhounds", territory: "Downtown", power: 50, relationship: "Neutral" },
-            { name: "The Black Lotus", territory: "Uptown", power: 70, relationship: "Hostile" },
-            { name: "The Red Dragons", territory: "The Docks", power: 40, relationship: "Neutral" }
-        ];
-
-        // Interaction with rival gangs
-        function interactWithRivalGang() {
-            const gangIndex = prompt("Which rival gang would you like to interact with? (Enter number: 1 for Bloodhounds, 2 for Black Lotus, 3 for Red Dragons)");
-            const gang = rivalGangs[gangIndex - 1];
-
-            if (gang) {
-                const action = prompt(`What do you want to do with the ${gang.name}? (Options: 1: Negotiate, 2: Fight, 3: Bribe)`);
-
-                if (action === "1") {
-                    negotiateWithGang(gang);
-                } else if (action === "2") {
-                    fightGang(gang);
-                } else if (action === "3") {
-                    bribeGang(gang);
-                } else {
-                    alert("Invalid option.");
-                }
-            } else {
-                alert("Invalid gang selection.");
-            }
-        }
-
-        // Negotiation with rival gang
-        function negotiateWithGang(gang) {
-            if (gang.relationship === "Hostile") {
-                alert(`${gang.name} is too hostile for negotiations. Prepare for a battle!`);
-                fightGang(gang);
-            } else {
-                const successChance = Math.random();
-                if (successChance > 0.5) {
-                    gang.relationship = "Friendly";
-                    alert(`Negotiations successful! ${gang.name} is now friendly towards you.`);
-                } else {
-                    gang.relationship = "Hostile";
-                    alert(`Negotiations failed. ${gang.name} is now hostile towards you.`);
-                }
-            }
-        }
-
-        // Fight a rival gang
-        function fightGang(gang) {
-            const fightOutcome = Math.random();
-            const playerStrength = mafiaInfluence + crew.length * 5;
-            const gangStrength = gang.power + Math.floor(Math.random() * 20);
-
-            if (fightOutcome > 0.5 && playerStrength > gangStrength) {
-                gang.power -= 10;
-                mafiaInfluence += 10;
-                alert(`You won the fight against ${gang.name}. Their power is weakened.`);
-            } else {
-                alert(`You lost the fight against ${gang.name}. Be careful next time.`);
-                reputation -= 5;
-            }
-
-            updateStats();
-            updateGangRelations();
-        }
-
-        // Bribing a rival gang
-        function bribeGang(gang) {
-            const bribeAmount = 1000;
-            if (money >= bribeAmount) {
-                money -= bribeAmount;
-                gang.relationship = "Friendly";
-                alert(`You successfully bribed ${gang.name} with $${bribeAmount}. They are now friendly.`);
-                updateStats();
-            } else {
-                alert("You don't have enough money to bribe this gang.");
-            }
-        }
-
-        // Update Rival Gang Relations
-        function updateGangRelations() {
-            let gangHtml = "<h3>Rival Gang Relationships:</h3><ul>";
-            rivalGangs.forEach((gang, index) => {
-                gangHtml += `<li>${gang.name} - Territory: ${gang.territory} - Power: ${gang.power} - Relationship: ${gang.relationship}</li>`;
-            });
-            gangHtml += "</ul>";
-            document.getElementById('rival-gangs').innerHTML = gangHtml;
-        }
-
-        // Special Events and Random Encounters
-        function randomEvent() {
-            const eventChance = Math.random();
-
-            if (eventChance < 0.1) {
-                const eventType = Math.floor(Math.random() * 3);
-                if (eventType === 0) {
-                    // Police Raid
-                    alert("A police raid has occurred at one of your businesses! Lose $2000 in fines.");
-                    money -= 2000;
-                } else if (eventType === 1) {
-                    // Betrayal
-                    alert("A trusted crew member has betrayed you! Lose 50 reputation.");
-                    reputation -= 50;
-                } else {
-                    // Unexpected Profit
-                    const profit = Math.floor(Math.random() * 3000) + 1000;
-                    alert(`You found a hidden stash of money! Gain $${profit}`);
-                    money += profit;
-                }
-            }
-        }
-
-        // Happiness, Sadness, and Fitness System
-        let happiness = 100;
-        let fitness = 100;
-        let sadness = 0;
-
-        function updatePlayerMood() {
-            if (happiness <= 0 || fitness <= 0) {
-                alert("Your character's health is declining! Take some time off to rest.");
-                fitness = 50;
-                happiness = 50;
-                money -= 500;
-            }
-
-            if (sadness >= 50) {
-                alert("You are feeling very sad. Your mafia empire is stressing you out.");
-                happiness -= 10;
-            }
-
-            if (happiness < 50) {
-                alert("Your happiness is low. Consider taking a break.");
-                sadness += 10;
-            }
-
-            // Random events affecting mood
-            const moodEvent = Math.random();
-            if (moodEvent < 0.2) {
-                fitness -= 10;
-            } else if (moodEvent < 0.4) {
-                happiness -= 10;
-            }
-
-            // Update Mood Stats
-            document.getElementById('happiness').textContent = happiness;
-            document.getElementById('fitness').textContent = fitness;
-            document.getElementById('sadness').textContent = sadness;
-        }
-
-        // Rest and Relaxation
-        function takeBreak() {
-            happiness = Math.min(100, happiness + 20);
-            fitness = Math.min(100, fitness + 10);
-            money -= 500;
-            alert("You took a break to relax and recharge.");
-            updatePlayerMood();
-            updateStats();
-        }
-
-        // ** UI Updates for Mood and Stats **
-        function updateMoodStats() {
-            document.getElementById('happiness').textContent = happiness;
-            document.getElementById('fitness').textContent = fitness;
-            document.getElementById('sadness').textContent = sadness;
-        }
-
-        // ** Game Loop to Simulate Time Passing (Simple implementation) **
-        function gameLoop() {
-            setInterval(() => {
-                randomEvent();
-                updatePlayerMood();
-            }, 10000); // Event and mood check every 10 seconds
-        }
-
-        // Initialize the Game Loop on Start
-        window.onload = function() {
-            initializeGame();
-            updateStats();
-            gameLoop();
-        }
-    </script>
-
-    <!-- UI Elements -->
-    <div id="game-container">
-        <div id="rival-gangs"></div>
-        <div id="businesses-list"></div>
-        <div id="crew-list"></div>
-        <div id="mood-stats">
-            <p>Happiness: <span id="happiness">100</span></p>
-            <p>Fitness: <span id="fitness">100</span></p>
-            <p>Sadness: <span id="sadness">0</span></p>
+        <h1>Welcome to Mafia Empire Simulator</h1>
+
+        <div id="game-navigation">
+            <button class="button" onclick="showStatsScreen()">Stats</button>
+            <button class="button" onclick="showMapScreen()">Territories</button>
+            <button class="button" onclick="showRecruitmentScreen()">Recruit</button>
+            <button class="button" onclick="showDrugMarket()">Drug Market</button>
+            <button class="button" onclick="saveGame()">Save Game</button>
+            <button class="button" onclick="loadGame()">Load Game</button>
+            <button class="button" onclick="resetGame()">Reset Game</button>
         </div>
-        <button class="button" onclick="interactWithRivalGang()">Interact with Rival Gang</button>
-        <button class="button" onclick="addBusiness('Nightclub')">Add Nightclub</button>
-        <button class="button" onclick="recruitCrewMember()">Recruit Crew Member</button>
-        <button class="button" onclick="takeBreak()">Take a Break</button>
+
+        <div id="content"></div>
     </div>
 
+    <script src="script.js"></script>
 </body>
 </html>
-        // Advanced Business System: Businesses with Growth
-        let businesses = [
-            { name: "Nightclub", revenue: 500, owner: "Mafia Boss", growth: 0.1, type: "Entertainment", risk: 0.3 },
-            { name: "Drug Lab", revenue: 1000, owner: "Mafia Boss", growth: 0.15, type: "Illegal", risk: 0.6 },
-            { name: "Casino", revenue: 800, owner: "Mafia Boss", growth: 0.12, type: "Entertainment", risk: 0.4 }
-        ];
+body {
+    font-family: Arial, sans-serif;
+    background-color: #222;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
 
-        // Add a new business
-        function addBusiness(name) {
-            const newBusiness = {
-                name: name,
-                revenue: 500,
-                owner: playerName,
-                growth: 0.1,
-                type: name === "Drug Lab" ? "Illegal" : "Entertainment",
-                risk: name === "Drug Lab" ? 0.6 : 0.3
-            };
-            businesses.push(newBusiness);
-            updateBusinessList();
-            alert(`${name} has been added to your empire!`);
-        }
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 5px;
+    border-radius: 5px;
+}
 
-        // Update Business List
-        function updateBusinessList() {
-            let businessHtml = "<h3>Your Businesses:</h3><ul>";
-            businesses.forEach((business, index) => {
-                businessHtml += `<li>${business.name} - Revenue: $${business.revenue} - Growth Rate: ${business.growth * 100}% - Risk: ${business.risk * 100}%</li>`;
-            });
-            businessHtml += "</ul>";
-            document.getElementById('businesses-list').innerHTML = businessHtml;
-        }
+button:hover {
+    background-color: #45a049;
+}
 
-        // Business Growth Simulation
-        function simulateBusinessGrowth() {
-            businesses.forEach((business) => {
-                // Risk factor affecting growth
-                if (Math.random() > business.risk) {
-                    business.revenue += business.revenue * business.growth;
-                    alert(`${business.name} has grown! New revenue: $${business.revenue}`);
-                } else {
-                    business.revenue -= business.revenue * 0.05;
-                    alert(`${business.name} has lost money due to unforeseen circumstances.`);
-                }
-            });
-            updateBusinessList();
-        }
+#game-navigation {
+    margin: 20px;
+}
 
-        // Manage Crew: Training and Special Abilities
-        const crew = [
-            { name: "Tony", role: "Enforcer", strength: 50, trainingLevel: 1 },
-            { name: "Maria", role: "Spy", strength: 40, trainingLevel: 1 },
-        ];
+#content {
+    padding: 20px;
+}
+let playerName = '';
+let money = 1000;
+let reputation = 50;
+let gangMembers = [];
+let territories = [];
+let rivalGangs = [
+    { name: "The Crimson Kings", territories: 2 },
+    { name: "The Night Vultures", territories: 1 },
+    { name: "The Black Hand", territories: 3 },
+];
 
-        // Recruit a new crew member
-        function recruitCrewMember() {
-            const crewName = prompt("Enter a name for your new crew member:");
-            const crewRole = prompt("Enter their role (e.g., Enforcer, Spy, Accountant, etc.):");
-            const newCrewMember = {
-                name: crewName,
-                role: crewRole,
-                strength: Math.floor(Math.random() * 50) + 40,
-                trainingLevel: 1
-            };
-            crew.push(newCrewMember);
-            updateCrewList();
-            alert(`${crewName} has joined your crew as a ${crewRole}!`);
-        }
+let playerStats = {
+    strength: 10,
+    loyalty: 50,
+    happiness: 100,
+    fitness: 50,
+};
 
-        // Train Crew Members
-        function trainCrewMember() {
-            const crewIndex = prompt("Which crew member would you like to train? (Enter number)");
-            const member = crew[crewIndex - 1];
+function updateGameUI() {
+    const stats = `
+        <p>Name: ${playerName}</p>
+        <p>Money: $${money}</p>
+        <p>Reputation: ${reputation}</p>
+        <p>Strength: ${playerStats.strength}</p>
+        <p>Loyalty: ${playerStats.loyalty}</p>
+        <p>Happiness: ${playerStats.happiness}</p>
+        <p>Fitness: ${playerStats.fitness}</p>
+    `;
+    document.getElementById("content").innerHTML = stats;
+}
 
-            if (member) {
-                const trainingCost = 1000;
-                if (money >= trainingCost) {
-                    money -= trainingCost;
-                    member.strength += 10;
-                    member.trainingLevel++;
-                    alert(`${member.name} has been trained! New strength: ${member.strength}`);
-                    updateStats();
-                    updateCrewList();
-                } else {
-                    alert("You don't have enough money to train this crew member.");
-                }
-            } else {
-                alert("Invalid crew member selection.");
-            }
-        }
+// Recruitment Screen
+function showRecruitmentScreen() {
+    const recruits = [
+        { name: "Johnny", strength: 50, loyalty: 70 },
+        { name: "Mika", strength: 40, loyalty: 80 },
+        { name: "Rico", strength: 60, loyalty: 65 },
+        { name: "Ella", strength: 45, loyalty: 75 },
+    ];
 
-        // Update Crew List
-        function updateCrewList() {
-            let crewHtml = "<h3>Your Crew:</h3><ul>";
-            crew.forEach((member, index) => {
-                crewHtml += `<li>${member.name} - Role: ${member.role} - Strength: ${member.strength} - Training Level: ${member.trainingLevel}</li>`;
-            });
-            crewHtml += "</ul>";
-            document.getElementById('crew-list').innerHTML = crewHtml;
-        }
+    const recruitList = recruits.map((recruit, index) => `
+        <p>${recruit.name} - Strength: ${recruit.strength}, Loyalty: ${recruit.loyalty}</p>
+        <button class="button" onclick="recruitGangMember(${index})">Recruit</button>
+    `).join("");
 
-        // ** Additional Player Choices for Empire Management **
-        function manageEmpire() {
-            const choice = prompt("What would you like to do next? (1: Manage Business, 2: Recruit Crew, 3: Train Crew, 4: Interact with Rival Gang)");
+    const recruitmentUI = `
+        <h3>Recruit Gang Members</h3>
+        ${recruitList}
+    `;
+    document.getElementById("content").innerHTML = recruitmentUI;
+}
 
-            if (choice === "1") {
-                simulateBusinessGrowth();
-            } else if (choice === "2") {
-                recruitCrewMember();
-            } else if (choice === "3") {
-                trainCrewMember();
-            } else if (choice === "4") {
-                interactWithRivalGang();
-            } else {
-                alert("Invalid choice.");
-            }
-        }
+function recruitGangMember(index) {
+    const recruit = [
+        { name: "Johnny", strength: 50, loyalty: 70 },
+        { name: "Mika", strength: 40, loyalty: 80 },
+        { name: "Rico", strength: 60, loyalty: 65 },
+        { name: "Ella", strength: 45, loyalty: 75 },
+    ][index];
 
-        // ** New System for Gang Territory**
-        let territories = [
-            { name: "Downtown", control: "Neutral", gang: null },
-            { name: "Uptown", control: "Neutral", gang: null },
-            { name: "The Docks", control: "Neutral", gang: null }
-        ];
+    if (reputation >= 10) {
+        gangMembers.push(recruit);
+        reputation -= 10;
+        alert(`${recruit.name} has joined your gang!`);
+        updateGameUI();
+    } else {
+        alert("You need more reputation to recruit this member.");
+    }
+}
 
-        // Assign territory to player or rival gang
-        function assignTerritoryToPlayer() {
-            const territoryIndex = prompt("Which territory would you like to control? (1: Downtown, 2: Uptown, 3: The Docks)");
-            const territory = territories[territoryIndex - 1];
+// Save and Load
+function saveGame() {
+    const saveData = {
+        playerName,
+        money,
+        reputation,
+        gangMembers,
+        territories,
+        playerStats,
+    };
+    localStorage.setItem("mafiaEmpireSave", JSON.stringify(saveData));
+    alert("Game saved successfully!");
+}
 
-            if (territory) {
-                territory.control = "Player";
-                territory.gang = playerName;
-                alert(`You now control the ${territory.name} territory!`);
-                updateTerritoryList();
-            } else {
-                alert("Invalid territory selection.");
-            }
-        }
+function loadGame() {
+    const saveData = JSON.parse(localStorage.getItem("mafiaEmpireSave"));
+    if (saveData) {
+        playerName = saveData.playerName;
+        money = saveData.money;
+        reputation = saveData.reputation;
+        gangMembers = saveData.gangMembers;
+        territories = saveData.territories;
+        playerStats = saveData.playerStats;
+        updateGameUI();
+        alert("Game loaded successfully!");
+    } else {
+        alert("No saved game found!");
+    }
+}
 
-        // Update Territory Control List
-        function updateTerritoryList() {
-            let territoryHtml = "<h3>Your Controlled Territories:</h3><ul>";
-            territories.forEach((territory, index) => {
-                territoryHtml += `<li>${territory.name} - Control: ${territory.control} - Gang: ${territory.gang || "None"}</li>`;
-            });
-            territoryHtml += "</ul>";
-            document.getElementById('territory-list').innerHTML = territoryHtml;
-        }
+function resetGame() {
+    if (confirm("Are you sure you want to reset the game? All progress will be lost.")) {
+        localStorage.removeItem("mafiaEmpireSave");
+        location.reload();
+    }
+}
 
-        // ** Player Health System - Injury, Resting, and Fitness Training**
-        let playerHealth = 100;
+function showMapScreen() {
+    const mapUI = `
+        <h3>Your Territories</h3>
+        ${territories.map((territory, index) => `<p>${territory.name}</p>`).join('')}
+        <button class="button" onclick="expandTerritory()">Expand Territory</button>
+    `;
+    document.getElementById("content").innerHTML = mapUI;
+}
 
-        function checkPlayerHealth() {
-            if (playerHealth <= 0) {
-                alert("Your character is critically injured! Game Over.");
-                resetGame();
-            } else {
-                alert(`Player Health: ${playerHealth}`);
-            }
-        }
-
-        // Injuries from rival gangs or missions
-        function injuryEvent() {
-            const injuryChance = Math.random();
-            if (injuryChance < 0.3) {
-                const injuryAmount = Math.floor(Math.random() * 30) + 10;
-                playerHealth -= injuryAmount;
-                alert(`You have been injured in a battle! Lost ${injuryAmount} health.`);
-                checkPlayerHealth();
-            }
-        }
-
-        // Fitness Training to increase health
-        function fitnessTraining() {
-            const trainingCost = 500;
-            if (money >= trainingCost) {
-                money -= trainingCost;
-                playerHealth = Math.min(100, playerHealth + 20);
-                alert("You have completed fitness training and gained health!");
-                updateStats();
-            } else {
-                alert("You don't have enough money for fitness training.");
-            }
-        }
-
-        // ** UI Updates for Territories and Health**
-        function updateTerritoryStats() {
-            document.getElementById('territory-list').innerHTML = territories.map(territory => 
-                `<p>${territory.name} - Controlled by: ${territory.control}</p>`
-            ).join('');
-            document.getElementById('player-health').textContent = playerHealth;
-        }
-
-        window.onload = function() {
-            initializeGame();
-            updateStats();
-            gameLoop();
-            updateTerritoryStats();
-        }
-    </script>
-
-    <!-- UI Elements -->
-    <div id="game-container">
-        <div id="rival-gangs"></div>
-        <div id="territory-list"></div>
-        <div id="businesses-list"></div>
-        <div id="crew-list"></div>
-        <div id="mood-stats">
-            <p>Happiness: <span id="happiness">100</span></p>
-            <p>Fitness: <span id="fitness">100</span></p>
-            <p>Sadness: <span id="sadness">0</span></p>
-            <p>Health: <span id="player-health">100</span></p>
-        </div>
-        <button class="button" onclick="manageEmpire()">Manage Empire</button>
-        <button class="button" onclick="assignTerritoryToPlayer()">Take Control of Territory</button>
-        <button class="button" onclick="fitnessTraining()">Fitness Training</button>
-    </div>
-
-</body>
-</html>
+function expandTerritory() {
+    if (money >= 5000) {
+        territories.push({ name: `New Territory ${territories.length + 1}` });
+        money -= 5000;
+        alert("You expanded your empire!");
+        updateGameUI();
+    } else {
+        alert("Not enough money to expand territory!");
+    }
+}
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>
