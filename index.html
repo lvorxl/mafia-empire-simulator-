@@ -308,7 +308,200 @@
 
         // Initialize Game UI
         updateGameUI();
+// Gang Member Object with more stats
+function createGangMember(name) {
+    return {
+        name: name,
+        strength: Math.floor(Math.random() * 50) + 50,  // Strength is random
+        health: 100,  // All gang members start with 100 health
+        specialAbility: "None",  // Placeholder for future abilities
+        experience: 0,  // Experience will increase as the member participates in battles
+        upgradeCost: 1000  // Cost to upgrade the gang member's strength
+    };
+}
 
+// Add Gang Member
+function addGangMember() {
+    const name = prompt("Enter the name of your new gang member:");
+    if (name && name.trim() !== "") {
+        const newMember = createGangMember(name);
+        gangMembers.push(newMember);
+        alert(`Gang Member ${name} added to your crew!`);
+    } else {
+        alert("Name cannot be empty.");
+    }
+    updateGameUI();
+}
+
+// Upgrade Gang Member
+function upgradeGangMember() {
+    if (gangMembers.length === 0) {
+        alert("You have no gang members to upgrade!");
+        return;
+    }
+
+    const gangMemberName = prompt("Enter the name of the gang member you want to upgrade:");
+    const member = gangMembers.find(m => m.name === gangMemberName);
+    
+    if (member) {
+        if (money >= member.upgradeCost) {
+            member.strength += 10;
+            money -= member.upgradeCost;
+            member.upgradeCost += 500;  // Increase the cost of further upgrades
+            alert(`${member.name}'s strength has increased to ${member.strength}`);
+        } else {
+            alert("You don't have enough money to upgrade this gang member.");
+        }
+    } else {
+        alert("Gang member not found.");
+    }
+    updateGameUI();
+}
+// Define Missions
+const missions = [
+    { id: 1, name: "Take Over 3 Rival Territories", rewardMoney: 5000, rewardReputation: 10 },
+    { id: 2, name: "Recruit 5 Gang Members", rewardMoney: 2000, rewardReputation: 5 },
+    { id: 3, name: "Defeat 10 Rival Gangs", rewardMoney: 10000, rewardReputation: 20 }
+];
+
+// Show Available Missions
+function showMissions() {
+    let missionList = "<h3>Available Missions</h3>";
+    missions.forEach(mission => {
+        missionList += `<p>${mission.name} - Reward: $${mission.rewardMoney}, ${mission.rewardReputation} Reputation</p>`;
+    });
+    missionList += `<button onclick="completeMission()">Complete Mission</button>`;
+    document.getElementById("content").innerHTML = missionList;
+}
+
+// Complete Mission and Get Rewards
+function completeMission() {
+    const completedMission = missions[Math.floor(Math.random() * missions.length)];
+    
+    money += completedMission.rewardMoney;
+    reputation += completedMission.rewardReputation;
+    alert(`Mission Completed: ${completedMission.name}!\nYou earned $${completedMission.rewardMoney} and ${completedMission.rewardReputation} Reputation.`);
+    
+    updateGameUI();
+}
+// Track Achievements
+let achievements = {
+    "First Battle Win": false,
+    "Expand Empire": false,
+    "Recruit Gang Members": false,
+};
+
+// Unlock Achievements
+function unlockAchievement(achievement) {
+    if (!achievements[achievement]) {
+        achievements[achievement] = true;
+        alert(`Achievement Unlocked: ${achievement}`);
+    }
+}
+
+// Show Achievements
+function showAchievements() {
+    let achievementsList = "<h3>Achievements</h3>";
+    for (let achievement in achievements) {
+        achievementsList += `<p>${achievement}: ${achievements[achievement] ? "Unlocked" : "Locked"}</p>`;
+    }
+    document.getElementById("content").innerHTML = achievementsList;
+}
+
+// Example of Achievement Progression
+function checkBattleOutcome() {
+    const outcome = (Math.random() > 0.5);  // Simulate battle outcome
+    if (outcome) {
+        unlockAchievement("First Battle Win");
+    }
+    updateGameUI();
+// Random Events Every 5 Minutes
+function startRandomEvents() {
+    setInterval(() => {
+        const events = [
+            "A police raid just happened at one of your businesses!",
+            "You found a stash of money hidden by a rival gang!",
+            "One of your gang members betrayed you and stole from your empire!",
+        ];
+
+        const randomEvent = events[Math.floor(Math.random() * events.length)];
+        alert(randomEvent);
+
+        // Handle the event impact (money loss, reputation loss, etc.)
+        if (randomEvent.includes("police raid")) {
+            money -= 1000;  // Lose money from raid
+        } else if (randomEvent.includes("stash of money")) {
+            money += 2000;  // Gain money from stash
+        } else if (randomEvent.includes("betrayed")) {
+            reputation -= 5;  // Lose reputation from betrayal
+        }
+
+        updateGameUI();
+    }, 300000); // Trigger every 5 minutes (300000 milliseconds)
+}
+function startNewGame() {
+    const playerName = prompt("Enter your mafia boss name:");
+    if (!playerName) {
+        alert("Name cannot be empty.");
+        return;
+    }
+
+    document.getElementById("character-name").textContent = `Boss: ${playerName}`;
+    document.getElementById("main-menu").style.display = "none";
+    document.getElementById("game-container").style.display = "block";
+
+    setupTabs();
+    updateGameUI();
+    startPassiveIncome();
+    startDailyEvents();
+    startRandomEvents();  // Start random events
+    unlockAchievement("First Battle Win");  // Unlock early achievement
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia Empire Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #444;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .tabs {
+            margin-top: 20px;
+        }
+        .tabs button {
+            padding: 10px 20px;
+            margin: 5px;
+            background-color: #555;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="character-name">Mafia Boss Game</h1>
+    <div id="main-menu">
+        <button onclick="startNewGame()" class="button">Start New Game</button>
+        <button onclick="loadGame()" class="button">Load Game</button>
+    </div>
+    <div id="game-container" style="display:none;">
+        <div id="game-navigation"></div>
+        <div id="content"></div>
+    </div>
+    
+    <script>
+        // Insert full game JavaScript code from the steps above here
     </script>
 </body>
 </html>
