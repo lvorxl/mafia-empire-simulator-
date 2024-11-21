@@ -3,30 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Mafia Empire Game</title>
+    <title>Mafia Empire 2D Game</title>
     <style>
-        body { margin: 0; }
-        canvas { display: block; }
-        #game-container { position: relative; }
-        #game-ui { position: absolute; top: 10px; left: 10px; color: white; }
-        .button { padding: 10px 20px; background-color: #333; color: white; border: none; margin: 5px; cursor: pointer; }
+        /* Basic Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #2c3e50;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        #game-ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            z-index: 2;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #1abc9c;
+            color: white;
+            border: none;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #16a085;
+            transform: scale(1.05);
+        }
+
+        #stats {
+            margin-top: 20px;
+        }
+
+        .bar {
+            width: 100%;
+            background-color: #95a5a6;
+            border-radius: 5px;
+            height: 20px;
+            margin-top: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .money-bar { background-color: #2ecc71; }
+        .reputation-bar { background-color: #f39c12; }
+        .empire-bar { background-color: #e74c3c; }
+
+        /* Game Background and Canvas */
+        #game-background {
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.w3schools.com/w3images/urban.jpg');
+            background-size: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            filter: blur(4px);
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #game-navigation {
+            margin-top: 20px;
+        }
+
+        .tabs button {
+            padding: 10px 20px;
+            background-color: #34495e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .tabs button:hover {
+            background-color: #2c3e50;
+        }
+
+        /* Map Canvas */
+        #territory-map {
+            width: 400px;
+            height: 400px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div id="game-container">
+        <div id="game-background"></div>
+
         <div id="game-ui">
             <p id="money-display">Money: $0</p>
             <p id="reputation">Reputation: 50</p>
             <p id="empire-level">Empire Level: 1</p>
-            <button class="button" onclick="expandTerritory()">Expand Territory</button>
+
+            <div class="bar">
+                <div id="money-progress" class="progress money-bar"></div>
+            </div>
+            <div class="bar">
+                <div id="reputation-progress" class="progress reputation-bar"></div>
+            </div>
+            <div class="bar">
+                <div id="empire-progress" class="progress empire-bar"></div>
+            </div>
+
+            <button class="button" onclick="expandTerritory()">Expand Territory ($5000)</button>
             <button class="button" onclick="showRecruitmentScreen()">Recruit</button>
             <button class="button" onclick="showMapScreen()">Map</button>
+            
+            <div id="stats"></div>
         </div>
-        <canvas id="game-canvas"></canvas>
+
+        <canvas id="territory-map"></canvas>
+
+        <audio id="bg-music" loop>
+            <source src="path/to/your-background-music.mp3" type="audio/mp3">
+        </audio>
+        <audio id="battle-win-sound">
+            <source src="path/to/battle-win-sound.mp3" type="audio/mp3">
+        </audio>
+        <audio id="territory-expanded-sound">
+            <source src="path/to/territory-expanded-sound.mp3" type="audio/mp3">
+        </audio>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
+        // Game Variables
         let money = 0;
         let reputation = 50;
         let empireLevel = 1;
@@ -34,52 +168,73 @@
         let gangMembers = [];
         let territories = [];
         let rivalGangs = generateRivalGangs(10);
+        let mapCanvas = document.getElementById("territory-map");
+        let mapContext = mapCanvas.getContext("2d");
 
-        // 3D Setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("game-canvas") });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        // Play background music
+        const bgMusic = document.getElementById('bg-music');
+        bgMusic.play();
 
-        // Lighting
-        const light = new THREE.AmbientLight(0x404040, 2);  // Ambient light
-        scene.add(light);
+        // Basic UI Update
+        function updateGameUI() {
+            document.getElementById("money-display").textContent = `Money: $${money}`;
+            document.getElementById("reputation").textContent = `Reputation: ${reputation}`;
+            document.getElementById("empire-level").textContent = `Empire Level: ${empireLevel}`;
 
-        // Create a simple 3D object (like a cube) to represent part of the world
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
+            document.getElementById("money-progress").style.width = `${(money / 10000) * 100}%`;
+            document.getElementById("reputation-progress").style.width = `${(reputation / 100) * 100}%`;
+            document.getElementById("empire-progress").style.width = `${(empireLevel / 10) * 100}%`;
 
-        camera.position.z = 5;
-
-        // Animation loop
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Rotate the cube
-            cube.rotation.x += 0.01;
-            cube.rotation.y += 0.01;
-
-            renderer.render(scene, camera);
+            document.getElementById("stats").innerHTML = `
+                <p>Territories: ${territories.length}</p>
+                <p>Gang Members: ${gangMembers.length}</p>
+            `;
         }
 
-        animate();
+        // Passive income function
+        function generatePassiveIncome() {
+            const incomePerTerritory = 200;
+            const incomePerGangMember = 100;
 
-        // Game Logic
+            let totalIncome = (territories.length * incomePerTerritory) + (gangMembers.length * incomePerGangMember);
+            money += totalIncome;
 
+            // Update UI and play sound
+            updateGameUI();
+            alert(`You earned $${totalIncome} from your empire!`);
+        }
+
+        setInterval(generatePassiveIncome, 5000);
+
+        // Expand territory
         function expandTerritory() {
             if (money >= 5000) {
                 money -= 5000;
                 territories.push({ name: `New Territory ${territories.length + 1}` });
+
+                drawTerritoryOnMap(); // Draw on the map after expansion
                 updateGameUI();
+                document.getElementById('territory-expanded-sound').play();
                 alert("Territory expanded!");
             } else {
                 alert("Not enough money!");
             }
         }
 
+        // Draw territory on map
+        function drawTerritoryOnMap() {
+            const territoryX = Math.random() * 380;
+            const territoryY = Math.random() * 380;
+            const territoryRadius = 10 + (territories.length * 2);
+
+            mapContext.beginPath();
+            mapContext.arc(territoryX, territoryY, territoryRadius, 0, 2 * Math.PI);
+            mapContext.fillStyle = "#2ecc71";
+            mapContext.fill();
+            mapContext.stroke();
+        }
+
+        // Show recruitment screen
         function showRecruitmentScreen() {
             const recruitUI = `
                 <h3>Recruit New Gang Members</h3>
@@ -88,6 +243,7 @@
             document.getElementById("game-ui").innerHTML = recruitUI;
         }
 
+        // Recruit a gang member
         function recruitGangMember() {
             if (money >= 5000) {
                 money -= 5000;
@@ -99,25 +255,7 @@
             }
         }
 
-        function updateGameUI() {
-            document.getElementById("money-display").textContent = `Money: $${money}`;
-            document.getElementById("reputation").textContent = `Reputation: ${reputation}`;
-            document.getElementById("empire-level").textContent = `Empire Level: ${empireLevel}`;
-        }
-
-        function generateRivalGangs(count) {
-            const gangNames = ["Iron Fangs", "Blood Wolves", "Shadow Serpents", "Crimson Daggers"];
-            const gangs = [];
-            for (let i = 0; i < count; i++) {
-                gangs.push({
-                    name: gangNames[Math.floor(Math.random() * gangNames.length)] + ` #${i + 1}`,
-                    strength: Math.floor(Math.random() * 100) + 50,
-                    territories: Math.floor(Math.random() * 5) + 1,
-                });
-            }
-            return gangs;
-        }
-
+        // Show map screen
         function showMapScreen() {
             const mapUI = `
                 <h3>Territory Map</h3>
@@ -127,27 +265,50 @@
             document.getElementById("game-ui").innerHTML = mapUI;
         }
 
+        // Attack rival gang
         function attackRival() {
             if (gangMembers.length === 0) {
+                        if (gangMembers.length === 0) {
                 alert("You need gang members to attack!");
                 return;
             }
 
             const targetGang = rivalGangs[Math.floor(Math.random() * rivalGangs.length)];
             const yourStrength = gangMembers.reduce((sum, member) => sum + member.strength, 0);
-            const outcome = yourStrength > targetGang.strength;
+            const targetStrength = targetGang.strength;
+
+            // Simulate a battle outcome
+            const outcome = yourStrength > targetStrength;
 
             if (outcome) {
                 targetGang.territories--;
                 territories.push({ name: `Captured from ${targetGang.name}` });
-                reputation += 10;
+                reputation += 15; // Gain reputation for victory
+                document.getElementById('battle-win-sound').play(); // Play victory sound
                 alert(`You defeated ${targetGang.name} and claimed their territory!`);
             } else {
-                reputation -= 10;
+                reputation -= 10; // Lose reputation for defeat
                 alert(`You lost the battle against ${targetGang.name}.`);
             }
             updateGameUI();
         }
+
+        // Generate rival gangs with random strength
+        function generateRivalGangs(num) {
+            let gangs = [];
+            for (let i = 0; i < num; i++) {
+                gangs.push({
+                    name: `Rival Gang ${i + 1}`,
+                    strength: Math.floor(Math.random() * 300) + 100,
+                    territories: 1
+                });
+            }
+            return gangs;
+        }
+
+        // Initialize Game UI
+        updateGameUI();
+
     </script>
 </body>
 </html>
