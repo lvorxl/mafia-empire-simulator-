@@ -3,48 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mafia Empire Simulator</title>
+    <title>3D Mafia Empire Game</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .tabs button {
-            margin: 5px;
-            padding: 10px;
-            cursor: pointer;
-        }
-        .button {
-            margin: 10px;
-            padding: 10px;
-            cursor: pointer;
-        }
-        #game-container {
-            display: none;
-        }
+        body { margin: 0; }
+        canvas { display: block; }
+        #game-container { position: relative; }
+        #game-ui { position: absolute; top: 10px; left: 10px; color: white; }
+        .button { padding: 10px 20px; background-color: #333; color: white; border: none; margin: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <div id="main-menu">
-        <h1>Mafia Empire Simulator</h1>
-        <button onclick="startNewGame()">Start New Game</button>
-        <button onclick="loadGame()">Load Game</button>
-    </div>
-    
     <div id="game-container">
-        <div id="game-navigation"></div>
-        <div id="content"></div>
-    </div>
-    
-    <div id="character-info">
-        <h3 id="character-name">Boss: </h3>
-        <p id="money-display">Money: $0</p>
-        <p id="reputation">Reputation: 50</p>
-        <p id="empire-level">Empire Level: 1</p>
-        <p id="passive-income">Passive Income: $500/min</p>
+        <div id="game-ui">
+            <p id="money-display">Money: $0</p>
+            <p id="reputation">Reputation: 50</p>
+            <p id="empire-level">Empire Level: 1</p>
+            <button class="button" onclick="expandTerritory()">Expand Territory</button>
+            <button class="button" onclick="showRecruitmentScreen()">Recruit</button>
+            <button class="button" onclick="showMapScreen()">Map</button>
+        </div>
+        <canvas id="game-canvas"></canvas>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
-        // Core Game Variables
         let money = 0;
         let reputation = 50;
         let empireLevel = 1;
@@ -52,99 +34,77 @@
         let gangMembers = [];
         let territories = [];
         let rivalGangs = generateRivalGangs(10);
-        let drugInventory = 0;
-        let drugPrice = 100;
 
-        // Initialization
-        function startNewGame() {
-            const playerName = prompt("Enter your mafia boss name:");
-            if (!playerName) {
-                alert("Name cannot be empty.");
-                return;
-            }
+        // 3D Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("game-canvas") });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-            document.getElementById("character-name").textContent = `Boss: ${playerName}`;
-            document.getElementById("main-menu").style.display = "none";
-            document.getElementById("game-container").style.display = "block";
+        // Lighting
+        const light = new THREE.AmbientLight(0x404040, 2);  // Ambient light
+        scene.add(light);
 
-            setupTabs();
-            updateGameUI();
-            startPassiveIncome();
-            startDailyEvents();
+        // Create a simple 3D object (like a cube) to represent part of the world
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        camera.position.z = 5;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate the cube
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+
+            renderer.render(scene, camera);
         }
 
-        function loadGame() {
-            const saveData = JSON.parse(localStorage.getItem("mafiaEmpireSave"));
-            if (saveData) {
-                money = saveData.money;
-                reputation = saveData.reputation;
-                empireLevel = saveData.empireLevel;
-                passiveIncome = saveData.passiveIncome;
-                gangMembers = saveData.gangMembers;
-                territories = saveData.territories;
-                rivalGangs = saveData.rivalGangs;
-                drugInventory = saveData.drugInventory;
-                drugPrice = saveData.drugPrice;
-                document.getElementById("character-name").textContent = `Boss: ${saveData.playerName}`;
-                document.getElementById("main-menu").style.display = "none";
-                document.getElementById("game-container").style.display = "block";
+        animate();
+
+        // Game Logic
+
+        function expandTerritory() {
+            if (money >= 5000) {
+                money -= 5000;
+                territories.push({ name: `New Territory ${territories.length + 1}` });
                 updateGameUI();
-                alert("Game loaded successfully!");
+                alert("Territory expanded!");
             } else {
-                alert("No save data found!");
+                alert("Not enough money!");
             }
         }
 
-        // Save and reset game
-        function saveGame() {
-            const saveData = {
-                playerName: document.getElementById("character-name").textContent.split(": ")[1],
-                money,
-                reputation,
-                empireLevel,
-                passiveIncome,
-                gangMembers,
-                territories,
-                rivalGangs,
-                drugInventory,
-                drugPrice
-            };
-            localStorage.setItem("mafiaEmpireSave", JSON.stringify(saveData));
-            alert("Game saved successfully!");
+        function showRecruitmentScreen() {
+            const recruitUI = `
+                <h3>Recruit New Gang Members</h3>
+                <button class="button" onclick="recruitGangMember()">Recruit ($5000)</button>
+            `;
+            document.getElementById("game-ui").innerHTML = recruitUI;
         }
 
-        function resetGame() {
-            if (confirm("Are you sure you want to reset the game? All progress will be lost.")) {
-                localStorage.removeItem("mafiaEmpireSave");
-                location.reload();
+        function recruitGangMember() {
+            if (money >= 5000) {
+                money -= 5000;
+                gangMembers.push({ name: `Gang Member ${gangMembers.length + 1}`, strength: Math.floor(Math.random() * 100) + 50 });
+                updateGameUI();
+                alert("New gang member recruited!");
+            } else {
+                alert("Not enough money!");
             }
         }
 
-        // Update UI
         function updateGameUI() {
             document.getElementById("money-display").textContent = `Money: $${money}`;
             document.getElementById("reputation").textContent = `Reputation: ${reputation}`;
             document.getElementById("empire-level").textContent = `Empire Level: ${empireLevel}`;
-            document.getElementById("passive-income").textContent = `Passive Income: $${passiveIncome}/minute`;
         }
 
-        // Tabs Setup
-        function setupTabs() {
-            const tabs = `
-                <div class="tabs">
-                    <button onclick="showRecruitmentScreen()">Recruit</button>
-                    <button onclick="showMapScreen()">Map</button>
-                    <button onclick="showGangMembersScreen()">Gang</button>
-                    <button onclick="showDrugMarket()">Market</button>
-                    <button onclick="showUpgradeScreen()">Upgrades</button>
-                    <button onclick="showStatsScreen()">Stats</button>
-                </div>
-            `;
-            document.getElementById("game-navigation").innerHTML = tabs;
-            document.getElementById("content").innerHTML = "<p>Welcome to Mafia Empire Simulator!</p>";
-        }
-
-        // Rival Gangs Generation
         function generateRivalGangs(count) {
             const gangNames = ["Iron Fangs", "Blood Wolves", "Shadow Serpents", "Crimson Daggers"];
             const gangs = [];
@@ -158,21 +118,13 @@
             return gangs;
         }
 
-        // Map Screen
         function showMapScreen() {
-            const rivalGangList = rivalGangs
-                .map((gang) => `<p>${gang.name} - Strength: ${gang.strength}, Territories: ${gang.territories}</p>`)
-                .join("");
-
             const mapUI = `
                 <h3>Territory Map</h3>
                 <p>Your Territories: ${territories.length}</p>
-                <button class="button" onclick="expandTerritory()">Expand Territory ($5000)</button>
-                <h4>Rival Gangs</h4>
-                ${rivalGangList}
                 <button class="button" onclick="attackRival()">Attack Rival Gang</button>
             `;
-            document.getElementById("content").innerHTML = mapUI;
+            document.getElementById("game-ui").innerHTML = mapUI;
         }
 
         function attackRival() {
@@ -195,137 +147,6 @@
                 alert(`You lost the battle against ${targetGang.name}.`);
             }
             updateGameUI();
-        }
-
-        // Recruitment Screen
-        function showRecruitmentScreen() {
-            const recruitUI = `
-                <h3>Recruit Gang Members</h3>
-                <button class="button" onclick="recruitGangMember()">Recruit Gang Member ($5000)</button>
-            `;
-            document.getElementById("content").innerHTML = recruitUI;
-        }
-
-        function recruitGangMember() {
-            if (money < 5000) {
-                alert("You don't have enough money to recruit a gang member.");
-                return;
-            }
-
-            money -= 5000;
-            const newMember = {
-                name: `Gang Member ${gangMembers.length + 1}`,
-                strength: Math.floor(Math.random() * 50) + 10
-            };
-            gangMembers.push(newMember);
-            updateGameUI();
-            alert(`${newMember.name} has joined your gang!`);
-        }
-
-        // Gang Members Screen
-        function showGangMembersScreen() {
-            const gangList = gangMembers
-                .map(member => `<p>${member.name} - Strength: ${member.strength}</p>`)
-                .join("");
-
-            const gangUI = `
-                <h3>Your Gang Members</h3>
-                ${gangList}
-            `;
-            document.getElementById("content").innerHTML = gangUI;
-        }
-
-        // Drug Market Screen
-        function showDrugMarket() {
-            const drugUI = `
-                <h3>Drug Market</h3>
-                <p>Drug Price: $${drugPrice} per unit</p>
-                <p>Current Drug Inventory: ${drugInventory} units</p>
-                <button class="button" onclick="buyDrugs()">Buy Drugs</button>
-                <button class="button" onclick="sellDrugs()">Sell Drugs</button>
-            `;
-            document.getElementById("content").innerHTML = drugUI;
-        }
-
-        function buyDrugs() {
-            if (money < drugPrice) {
-                alert("You don't have enough money to buy drugs.");
-                return;
-            }
-                        money -= drugPrice;
-            drugInventory += 1;
-            updateGameUI();
-            alert("You bought 1 unit of drugs!");
-        }
-
-        function sellDrugs() {
-            if (drugInventory < 1) {
-                alert("You don't have any drugs to sell.");
-                return;
-            }
-
-            money += drugPrice;
-            drugInventory -= 1;
-            updateGameUI();
-            alert("You sold 1 unit of drugs!");
-        }
-
-        // Upgrades Screen
-        function showUpgradeScreen() {
-            const upgradeUI = `
-                <h3>Empire Upgrades</h3>
-                <button class="button" onclick="upgradeEmpire()">Upgrade Empire Level ($10000)</button>
-            `;
-            document.getElementById("content").innerHTML = upgradeUI;
-        }
-
-        function upgradeEmpire() {
-            if (money < 10000) {
-                alert("You don't have enough money to upgrade your empire.");
-                return;
-            }
-
-            money -= 10000;
-            empireLevel += 1;
-            passiveIncome += 1000;
-            updateGameUI();
-            alert(`Your empire level is now ${empireLevel}! Passive income increased to $${passiveIncome}/minute.`);
-        }
-
-        // Stats Screen
-        function showStatsScreen() {
-            const statsUI = `
-                <h3>Empire Stats</h3>
-                <p>Money: $${money}</p>
-                <p>Reputation: ${reputation}</p>
-                <p>Empire Level: ${empireLevel}</p>
-                <p>Gang Members: ${gangMembers.length}</p>
-                <p>Territories: ${territories.length}</p>
-                <p>Drug Inventory: ${drugInventory} units</p>
-                <button class="button" onclick="saveGame()">Save Game</button>
-                <button class="button" onclick="resetGame()">Reset Game</button>
-            `;
-            document.getElementById("content").innerHTML = statsUI;
-        }
-
-        // Game Events
-        function startDailyEvents() {
-            setInterval(() => {
-                const events = [
-                    "A rival gang attacked!",
-                    "One of your businesses was raided.",
-                    "You gained new allies."
-                ];
-                const randomEvent = events[Math.floor(Math.random() * events.length)];
-                alert(randomEvent);
-            }, 60000); // Every minute
-        }
-
-        function startPassiveIncome() {
-            setInterval(() => {
-                money += passiveIncome;
-                updateGameUI();
-            }, 60000); // Every minute
         }
     </script>
 </body>
