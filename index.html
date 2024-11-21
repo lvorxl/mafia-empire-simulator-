@@ -3,217 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mafia Empire Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            background-color: #222;
-            color: white;
-        }
-        h1, h3, h4 {
-            margin-top: 10px;
-        }
-        .button {
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #444;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .tabs {
-            margin-top: 20px;
-        }
-        .tabs button {
-            padding: 10px 20px;
-            margin: 5px;
-            background-color: #555;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .tabs button:hover, .button:hover {
-            background-color: #666;
-        }
-        #game-container {
-            margin: 20px auto;
-            padding: 20px;
-            max-width: 800px;
-            border: 2px solid #444;
-            border-radius: 10px;
-            background-color: #333;
-        }
-        p {
-            margin: 10px;
-        }
-    </style>
+    <title>Mafia Empire Simulator</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1 id="character-name">Mafia Empire Simulator</h1>
-    <div id="main-menu">
-        <button onclick="startNewGame()" class="button">Start New Game</button>
-        <button onclick="loadGame()" class="button">Load Game</button>
+    <!-- Home Screen -->
+    <div id="home-screen">
+        <h1>Welcome to Mafia Empire</h1>
+        <button onclick="startGame()">Start Game</button>
     </div>
-    <div id="game-container" style="display:none;">
-        <div id="game-navigation"></div>
-        <div id="content"></div>
-        <div id="stats">
-            <p id="money-display"></p>
-            <p id="reputation"></p>
-            <p id="empire-level"></p>
-            <p id="passive-income"></p>
+
+    <!-- Game Screen -->
+    <div id="game-screen" style="display: none;">
+        <div class="stats">
+            <h2>Empire Stats</h2>
+            <p>Money: <span id="money">$0</span></p>
+            <p>Territory: <span id="territory">0</span></p>
+            <p>Crew: <span id="crew">0</span></p>
+            <p>Weapons: <span id="weapons">0</span></p>
+            <p>Drugs: <span id="drugs">0</span></p>
+            <p>Reputation: <span id="reputation">0</span></p>
+            <p>Boss Level: <span id="boss-level">1</span></p>
+        </div>
+
+        <div class="actions">
+            <button id="recruit" onclick="recruitCrew()">Recruit Crew</button>
+            <button id="deal-drugs" onclick="dealDrugs()">Deal Drugs</button>
+            <button id="expand-territory" onclick="expandTerritory()">Expand Territory</button>
+            <button id="sell-weapons" onclick="sellWeapons()">Sell Weapons</button>
+            <button id="launder-money" onclick="launderMoney()">Launder Money</button>
+            <button id="level-up-boss" onclick="levelUpBoss()">Level Up Boss</button>
+        </div>
+
+        <div id="log">
+            <h2>Game Log</h2>
+            <ul id="log-events">
+                <li>Game Started</li>
+            </ul>
         </div>
     </div>
 
-    <script>
-        // Core Game Variables
-        let money = 0;
-        let reputation = 50;
-        let empireLevel = 1;
-        let passiveIncome = 500;
-        let gangMembers = [];
-        let territories = [];
-        let rivalGangs = generateRivalGangs(10);
-        let achievements = {
-            "First Battle Win": false,
-            "Expand Empire": false,
-            "Recruit Gang Members": false,
-        };
-
-        // Initialization
-        function startNewGame() {
-            const playerName = prompt("Enter your mafia boss name:");
-            if (!playerName) {
-                alert("Name cannot be empty.");
-                return;
-            }
-
-            document.getElementById("character-name").textContent = `Boss: ${playerName}`;
-            document.getElementById("main-menu").style.display = "none";
-            document.getElementById("game-container").style.display = "block";
-
-            setupTabs();
-            updateGameUI();
-            startPassiveIncome();
-            startDailyEvents();
-            startRandomEvents();
-        }
-
-        function loadGame() {
-            const saveData = JSON.parse(localStorage.getItem("mafiaEmpireSave"));
-            if (saveData) {
-                money = saveData.money;
-                reputation = saveData.reputation;
-                empireLevel = saveData.empireLevel;
-                passiveIncome = saveData.passiveIncome;
-                gangMembers = saveData.gangMembers;
-                territories = saveData.territories;
-                rivalGangs = saveData.rivalGangs;
-                document.getElementById("character-name").textContent = `Boss: ${saveData.playerName}`;
-                document.getElementById("main-menu").style.display = "none";
-                document.getElementById("game-container").style.display = "block";
-                updateGameUI();
-                alert("Game loaded successfully!");
-            } else {
-                alert("No save data found!");
-            }
-        }
-
-        // Save and Reset Game
-        function saveGame() {
-            const saveData = {
-                playerName: document.getElementById("character-name").textContent.split(": ")[1],
-                money,
-                reputation,
-                empireLevel,
-                passiveIncome,
-                gangMembers,
-                territories,
-                rivalGangs,
-            };
-            localStorage.setItem("mafiaEmpireSave", JSON.stringify(saveData));
-            alert("Game saved successfully!");
-        }
-
-        function resetGame() {
-            if (confirm("Are you sure you want to reset the game? All progress will be lost.")) {
-                localStorage.removeItem("mafiaEmpireSave");
-                location.reload();
-            }
-        }
-
-        // Update UI
-        function updateGameUI() {
-            document.getElementById("money-display").textContent = `Money: $${money}`;
-            document.getElementById("reputation").textContent = `Reputation: ${reputation}`;
-            document.getElementById("empire-level").textContent = `Empire Level: ${empireLevel}`;
-            document.getElementById("passive-income").textContent = `Passive Income: $${passiveIncome}/minute`;
-        }
-
-        // Tabs Setup
-        function setupTabs() {
-            const tabs = `
-                <div class="tabs">
-                    <button onclick="showRecruitmentScreen()">Recruit</button>
-                    <button onclick="showMapScreen()">Map</button>
-                    <button onclick="showGangMembersScreen()">Gang</button>
-                    <button onclick="showDrugMarket()">Market</button>
-                    <button onclick="showUpgradeScreen()">Upgrades</button>
-                    <button onclick="showAchievements()">Achievements</button>
-                </div>
-            `;
-            document.getElementById("game-navigation").innerHTML = tabs;
-            document.getElementById("content").innerHTML = "<p>Welcome to Mafia Empire Simulator!</p>";
-        }
-
-        // Rival Gangs Generation
-        function generateRivalGangs(count) {
-            const gangNames = ["Iron Fangs", "Blood Wolves", "Shadow Serpents", "Crimson Daggers"];
-            const gangs = [];
-            for (let i = 0; i < count; i++) {
-                gangs.push({
-                    name: gangNames[Math.floor(Math.random() * gangNames.length)] + ` #${i + 1}`,
-                    strength: Math.floor(Math.random() * 100) + 50,
-                    territories: Math.floor(Math.random() * 5) + 1,
-                });
-            }
-            return gangs;
-        }
-
-        // Random Events
-        function startRandomEvents() {
-            setInterval(() => {
-                const events = [
-                    "A police raid just happened at one of your businesses!",
-                    "You found a stash of money hidden by a rival gang!",
-                    "One of your gang members betrayed you and stole from your empire!",
-                ];
-
-                const randomEvent = events[Math.floor(Math.random() * events.length)];
-                alert(randomEvent);
-
-                if (randomEvent.includes("police raid")) {
-                    money -= 1000;
-                } else if (randomEvent.includes("stash of money")) {
-                    money += 2000;
-                } else if (randomEvent.includes("betrayed")) {
-                    reputation -= 5;
-                }
-
-                updateGameUI();
-            }, 300000); // Trigger every 5 minutes (300000 milliseconds)
-        }
-
-        // Passive Income
-        function startPassiveIncome() {
-            setInterval(() => {
-                money += passiveIncome;
-                updateGameUI();
-            }, 60000); // Every minute
-        }
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia Empire Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Home Screen -->
+    <div id="home-screen">
+        <h1>Welcome to Mafia Empire</h1>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" style="display: none;">
+        <div class="stats">
+            <h2>Empire Stats</h2>
+            <p>Money: <span id="money">$0</span></p>
+            <p>Territory: <span id="territory">0</span></p>
+            <p>Crew: <span id="crew">0</span></p>
+            <p>Weapons: <span id="weapons">0</span></p>
+            <p>Drugs: <span id="drugs">0</span></p>
+            <p>Reputation: <span id="reputation">0</span></p>
+            <p>Boss Level: <span id="boss-level">1</span></p>
+        </div>
+
+        <div class="actions">
+            <button id="recruit" onclick="recruitCrew()">Recruit Crew</button>
+            <button id="deal-drugs" onclick="dealDrugs()">Deal Drugs</button>
+            <button id="expand-territory" onclick="expandTerritory()">Expand Territory</button>
+            <button id="sell-weapons" onclick="sellWeapons()">Sell Weapons</button>
+            <button id="launder-money" onclick="launderMoney()">Launder Money</button>
+            <button id="level-up-boss" onclick="levelUpBoss()">Level Up Boss</button>
+        </div>
+
+        <div id="log">
+            <h2>Game Log</h2>
+            <ul id="log-events">
+                <li>Game Started</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+// Initial stats
+let money = 0;
+let crew = 0;
+let territory = 0;
+let weapons = 0;
+let drugs = 0;
+let reputation = 0;
+let bossLevel = 1;
+let launderingInProgress = false;
+let upgradeInProgress = false;
+
+// Home Screen: Start Game
+function startGame() {
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    addLogEvent('Game Started');
+}
+
+// Update Stats
+function updateStats() {
+    document.getElementById('money').textContent = `$${money}`;
+    document.getElementById('territory').textContent = territory;
+    document.getElementById('crew').textContent = crew;
+    document.getElementById('weapons').textContent = weapons;
+    document.getElementById('drugs').textContent = drugs;
+    document.getElementById('reputation').textContent = reputation;
+    document.getElementById('boss-level').textContent = bossLevel;
+}
+
+// Add Events to Log
+function addLogEvent(event) {
+    const logEvents = document.getElementById('log-events');
+    const newEvent = document.createElement('li');
+    newEvent.textContent = event;
+    logEvents.appendChild(newEvent);
+}
+
+// Recruit Crew
+function recruitCrew() {
+    if (upgradeInProgress) {
+        addLogEvent('You are already recruiting. Please wait.');
+        return;
+    }
+
+    upgradeInProgress = true;
+    addLogEvent('Recruitment started. It will take 5 seconds.');
+
+    setTimeout(() => {
+        crew++;
+        money -= 100; // Recruitment cost
+        addLogEvent('Recruitment completed. A new crew member has joined.');
+        upgradeInProgress = false;
+        updateStats();
+    }, 5000); // 5 seconds recruitment time
+}
+
+// Deal Drugs
+function dealDrugs() {
+    drugs += 10;
+    money += 100;
+    addLogEvent('Drugs deal successful. You made $100.');
+    updateStats();
+}
+
+// Expand Territory
+function expandTerritory() {
+    if (money >= 1000) {
+        territory++;
+        money -= 1000;
+        addLogEvent('Territory expanded!');
+        updateStats();
+    } else {
+        addLogEvent('Not enough money to expand territory.');
+    }
+}
+
+// Sell Weapons
+function sellWeapons() {
+    if (weapons > 0) {
+        weapons--;
+        money += 200;
+        addLogEvent('Sold 1 weapon for $200.');
+        updateStats();
+    } else {
+        addLogEvent('You have no weapons to sell.');
+    }
+}
+
+// Launder Money
+function launderMoney() {
+    if (money < 1000) {
+        addLogEvent('Not enough money to launder.');
+        return;
+    }
+
+    if (launderingInProgress) {
+        addLogEvent('Money laundering is in progress. Please wait.');
+        return;
+    }
+
+    launderingInProgress = true;
+    addLogEvent('Money laundering started. It will take 10 seconds.');
+
+    setTimeout(() => {
+        money += 2000; // Laundering gives more money
+        addLogEvent('Money laundering completed. You received clean money!');
+        launderingInProgress = false;
+        updateStats();
+    }, 10000); // 10 seconds laundering time
+}
+
+// Level Up Boss
+function levelUpBoss() {
+    if (money < 5000) {
+        addLogEvent('You need more money to level up your boss.');
+        return;
+    }
+
+    money -= 5000;
+    bossLevel++;
+    addLogEvent(`Your boss leveled up to level ${bossLevel}. New abilities unlocked!`);
+    updateStats();
+}
+
+// Random Event Generator (Triggered Every 10 Seconds)
+function generateRandomEvent() {
+    const events = [
+        'A rival gang tried to take over one of your territories. You\'ve repelled them!',
+        'The police are closing in on one of your hideouts. You had to bribe them!',
+        'A new weapons shipment arrived. You\'ve expanded your armory!',
+        'A trusted crew member betrayed you. Lost some weapons and money!',
+        'Your drug deal went smoothly. Made a huge profit!'
+    ];
+
+    const randomEvent = events[Math.floor(Math.random() * events.length)];
+    addLogEvent(randomEvent);
+
+    // Random event impact
+    if (randomEvent.includes('profit')) {
+        money += 500;
+    } else if (randomEvent.includes('betrayed')) {
+        weapons -= 2;
+        money -= 100;
+    }
+    updateStats();
+}
+
+// Set Interval to Trigger Random Events Every 10 Seconds
+setInterval(generateRandomEvent, 10000);
