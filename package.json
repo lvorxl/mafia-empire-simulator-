@@ -1,0 +1,20 @@
+{
+  "name": "college-football-simulator",
+  "version": "1.0.0",
+  "description": "College Football Dynasty Simulator - Build your championship program!",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step required for static site'"
+  },
+  "keywords": ["college", "football", "simulator", "game", "sports"],
+  "author": "College Football Fan",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
