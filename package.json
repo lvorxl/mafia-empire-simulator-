@@ -1,20 +1,42 @@
 {
-  "name": "college-football-simulator",
+  "name": "college-football-dynasty-manager",
   "version": "1.0.0",
-  "description": "College Football Dynasty Simulator - Build your championship program!",
-  "main": "index.html",
+  "description": "A comprehensive college football management simulation game",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "build": "echo 'No build step required for static site'"
+    "dev": "nodemon server.js",
+    "build": "echo 'Build complete'",
+    "test": "echo 'No tests specified'"
   },
-  "keywords": ["college", "football", "simulator", "game", "sports"],
-  "author": "College Football Fan",
+  "keywords": ["college", "football", "management", "simulation", "dynasty", "sports", "game"],
+  "author": "College Football Dynasty Team",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "sqlite3": "^5.1.6",
+    "bcryptjs": "^2.4.3",
+    "uuid": "^9.0.1",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": ">=14.0.0"
-  }
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/college-football-dynasty-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/college-football-dynasty-manager/issues"
+  },
+  "homepage": "https://github.com/your-username/college-football-dynasty-manager#readme"
 }
