@@ -3,243 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mafia Empire Simulator</title>
+    <title>College Football Simulator</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <!-- Home Screen -->
-    <div id="home-screen">
-        <h1>Welcome to Mafia Empire</h1>
-        <button onclick="startGame()">Start Game</button>
-    </div>
-
-    <!-- Game Screen -->
-    <div id="game-screen" style="display: none;">
-        <div class="stats">
-            <h2>Empire Stats</h2>
-            <p>Money: <span id="money">$0</span></p>
-            <p>Territory: <span id="territory">0</span></p>
-            <p>Crew: <span id="crew">0</span></p>
-            <p>Weapons: <span id="weapons">0</span></p>
-            <p>Drugs: <span id="drugs">0</span></p>
-            <p>Reputation: <span id="reputation">0</span></p>
-            <p>Boss Level: <span id="boss-level">1</span></p>
-        </div>
-
-        <div class="actions">
-            <button id="recruit" onclick="recruitCrew()">Recruit Crew</button>
-            <button id="deal-drugs" onclick="dealDrugs()">Deal Drugs</button>
-            <button id="expand-territory" onclick="expandTerritory()">Expand Territory</button>
-            <button id="sell-weapons" onclick="sellWeapons()">Sell Weapons</button>
-            <button id="launder-money" onclick="launderMoney()">Launder Money</button>
-            <button id="level-up-boss" onclick="levelUpBoss()">Level Up Boss</button>
-        </div>
-
-        <div id="log">
-            <h2>Game Log</h2>
-            <ul id="log-events">
-                <li>Game Started</li>
-            </ul>
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen active">
+        <div class="menu-container">
+            <h1 class="game-title">
+                <i class="fas fa-football-ball"></i>
+                College Football Dynasty
+            </h1>
+            <div class="menu-buttons">
+                <button class="menu-btn primary" onclick="showTeamSelection()">
+                    <i class="fas fa-play"></i>
+                    Start New Dynasty
+                </button>
+                <button class="menu-btn" onclick="showRules()">
+                    <i class="fas fa-book"></i>
+                    How to Play
+                </button>
+                <button class="menu-btn" onclick="showCredits()">
+                    <i class="fas fa-trophy"></i>
+                    Credits
+                </button>
+            </div>
         </div>
     </div>
 
-    <script src="game.js"></script>
+    <!-- Team Selection -->
+    <div id="team-selection" class="screen">
+        <div class="selection-container">
+            <h2>Choose Your Team</h2>
+            <div class="team-grid" id="team-grid">
+                <!-- Teams will be populated by JavaScript -->
+            </div>
+            <button class="back-btn" onclick="showMainMenu()">
+                <i class="fas fa-arrow-left"></i>
+                Back
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Dashboard -->
+    <div id="game-dashboard" class="screen">
+        <header class="dashboard-header">
+            <div class="team-info">
+                <img id="team-logo" src="" alt="Team Logo" class="team-logo">
+                <div>
+                    <h2 id="team-name">Team Name</h2>
+                    <p id="team-record">0-0 (Conference: 0-0)</p>
+                </div>
+            </div>
+            <div class="season-info">
+                <h3 id="season-year">2024 Season</h3>
+                <p id="week-info">Week 1</p>
+            </div>
+            <div class="coach-info">
+                <h3>Coach <span id="coach-name">Smith</span></h3>
+                <p>Prestige: <span id="prestige">★★☆☆☆</span></p>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="stats-panel">
+                <h3><i class="fas fa-chart-line"></i> Team Stats</h3>
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Offense Rating</span>
+                        <span class="stat-value" id="offense-rating">75</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Defense Rating</span>
+                        <span class="stat-value" id="defense-rating">72</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Special Teams</span>
+                        <span class="stat-value" id="special-teams">70</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Overall Rating</span>
+                        <span class="stat-value overall" id="overall-rating">72</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="schedule-panel">
+                <h3><i class="fas fa-calendar"></i> Upcoming Games</h3>
+                <div id="schedule-list" class="schedule-list">
+                    <!-- Schedule will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="actions-panel">
+                <h3><i class="fas fa-gamepad"></i> Actions</h3>
+                <div class="action-buttons">
+                    <button class="action-btn simulate" onclick="simulateNextGame()" id="simulate-btn">
+                        <i class="fas fa-fast-forward"></i>
+                        Simulate Next Game
+                    </button>
+                    <button class="action-btn recruit" onclick="showRecruitment()">
+                        <i class="fas fa-user-plus"></i>
+                        Recruit Players
+                    </button>
+                    <button class="action-btn practice" onclick="showPractice()">
+                        <i class="fas fa-dumbbell"></i>
+                        Team Practice
+                    </button>
+                    <button class="action-btn advance" onclick="advanceWeek()" id="advance-btn" style="display: none;">
+                        <i class="fas fa-step-forward"></i>
+                        Advance Week
+                    </button>
+                </div>
+            </div>
+
+            <div class="news-panel">
+                <h3><i class="fas fa-newspaper"></i> Latest News</h3>
+                <div id="news-feed" class="news-feed">
+                    <div class="news-item">
+                        <p>Welcome to your first season as head coach!</p>
+                        <small>Season Start</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Simulation Modal -->
+    <div id="game-modal" class="modal">
+        <div class="modal-content game-result">
+            <div class="game-header">
+                <h2 id="game-matchup">Team A vs Team B</h2>
+                <p id="game-week">Week 1</p>
+            </div>
+            <div class="score-display">
+                <div class="team-score">
+                    <img id="home-logo" src="" alt="Home Team" class="score-logo">
+                    <div class="score-info">
+                        <h3 id="home-team">Home Team</h3>
+                        <div class="score" id="home-score">0</div>
+                    </div>
+                </div>
+                <div class="vs">vs</div>
+                <div class="team-score">
+                    <img id="away-logo" src="" alt="Away Team" class="score-logo">
+                    <div class="score-info">
+                        <h3 id="away-team">Away Team</h3>
+                        <div class="score" id="away-score">0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-stats">
+                <h4>Game Stats</h4>
+                <div id="game-stats-content">
+                    <!-- Stats will be populated by JavaScript -->
+                </div>
+            </div>
+            <button class="close-modal" onclick="closeGameModal()">Continue Season</button>
+        </div>
+    </div>
+
+    <!-- Recruitment Modal -->
+    <div id="recruitment-modal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-user-plus"></i> Player Recruitment</h2>
+            <div id="recruit-list" class="recruit-list">
+                <!-- Recruits will be populated by JavaScript -->
+            </div>
+            <button class="close-modal" onclick="closeRecruitmentModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Practice Modal -->
+    <div id="practice-modal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-dumbbell"></i> Team Practice</h2>
+            <p>Choose what to focus on during this week's practice:</p>
+            <div class="practice-options">
+                <button class="practice-btn" onclick="focusPractice('offense')">
+                    <i class="fas fa-running"></i>
+                    Offensive Drills
+                </button>
+                <button class="practice-btn" onclick="focusPractice('defense')">
+                    <i class="fas fa-shield-alt"></i>
+                    Defensive Drills
+                </button>
+                <button class="practice-btn" onclick="focusPractice('special')">
+                    <i class="fas fa-futbol"></i>
+                    Special Teams
+                </button>
+                <button class="practice-btn" onclick="focusPractice('conditioning')">
+                    <i class="fas fa-heartbeat"></i>
+                    Conditioning
+                </button>
+            </div>
+            <button class="close-modal" onclick="closePracticeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-book"></i> How to Play</h2>
+            <div class="rules-content">
+                <h3>Objective</h3>
+                <p>Lead your college football team to glory by winning games, recruiting top players, and building a dynasty that will be remembered for years to come.</p>
+                
+                <h3>Gameplay</h3>
+                <ul>
+                    <li><strong>Simulate Games:</strong> Watch your team compete against opponents each week</li>
+                    <li><strong>Recruit Players:</strong> Find and recruit talented high school players</li>
+                    <li><strong>Practice:</strong> Focus training on different aspects to improve team ratings</li>
+                    <li><strong>Build Prestige:</strong> Win games and championships to increase your program's reputation</li>
+                </ul>
+
+                <h3>Team Ratings</h3>
+                <ul>
+                    <li><strong>Offense:</strong> Affects your team's ability to score points</li>
+                    <li><strong>Defense:</strong> Determines how well you stop opponents</li>
+                    <li><strong>Special Teams:</strong> Influences field goals, punts, and returns</li>
+                </ul>
+
+                <h3>Winning</h3>
+                <p>Success is measured by wins, conference championships, and national titles. Build your dynasty and become a legendary coach!</p>
+            </div>
+            <button class="close-modal" onclick="closeRulesModal()">Got it!</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mafia Empire Simulator</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- Home Screen -->
-    <div id="home-screen">
-        <h1>Welcome to Mafia Empire</h1>
-        <button onclick="startGame()">Start Game</button>
-    </div>
-
-    <!-- Game Screen -->
-    <div id="game-screen" style="display: none;">
-        <div class="stats">
-            <h2>Empire Stats</h2>
-            <p>Money: <span id="money">$0</span></p>
-            <p>Territory: <span id="territory">0</span></p>
-            <p>Crew: <span id="crew">0</span></p>
-            <p>Weapons: <span id="weapons">0</span></p>
-            <p>Drugs: <span id="drugs">0</span></p>
-            <p>Reputation: <span id="reputation">0</span></p>
-            <p>Boss Level: <span id="boss-level">1</span></p>
-        </div>
-
-        <div class="actions">
-            <button id="recruit" onclick="recruitCrew()">Recruit Crew</button>
-            <button id="deal-drugs" onclick="dealDrugs()">Deal Drugs</button>
-            <button id="expand-territory" onclick="expandTerritory()">Expand Territory</button>
-            <button id="sell-weapons" onclick="sellWeapons()">Sell Weapons</button>
-            <button id="launder-money" onclick="launderMoney()">Launder Money</button>
-            <button id="level-up-boss" onclick="levelUpBoss()">Level Up Boss</button>
-        </div>
-
-        <div id="log">
-            <h2>Game Log</h2>
-            <ul id="log-events">
-                <li>Game Started</li>
-            </ul>
-        </div>
-    </div>
-
-    <script src="game.js"></script>
-</body>
-</html>
-// Initial stats
-let money = 0;
-let crew = 0;
-let territory = 0;
-let weapons = 0;
-let drugs = 0;
-let reputation = 0;
-let bossLevel = 1;
-let launderingInProgress = false;
-let upgradeInProgress = false;
-
-// Home Screen: Start Game
-function startGame() {
-    document.getElementById('home-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'block';
-    addLogEvent('Game Started');
-}
-
-// Update Stats
-function updateStats() {
-    document.getElementById('money').textContent = `$${money}`;
-    document.getElementById('territory').textContent = territory;
-    document.getElementById('crew').textContent = crew;
-    document.getElementById('weapons').textContent = weapons;
-    document.getElementById('drugs').textContent = drugs;
-    document.getElementById('reputation').textContent = reputation;
-    document.getElementById('boss-level').textContent = bossLevel;
-}
-
-// Add Events to Log
-function addLogEvent(event) {
-    const logEvents = document.getElementById('log-events');
-    const newEvent = document.createElement('li');
-    newEvent.textContent = event;
-    logEvents.appendChild(newEvent);
-}
-
-// Recruit Crew
-function recruitCrew() {
-    if (upgradeInProgress) {
-        addLogEvent('You are already recruiting. Please wait.');
-        return;
-    }
-
-    upgradeInProgress = true;
-    addLogEvent('Recruitment started. It will take 5 seconds.');
-
-    setTimeout(() => {
-        crew++;
-        money -= 100; // Recruitment cost
-        addLogEvent('Recruitment completed. A new crew member has joined.');
-        upgradeInProgress = false;
-        updateStats();
-    }, 5000); // 5 seconds recruitment time
-}
-
-// Deal Drugs
-function dealDrugs() {
-    drugs += 10;
-    money += 100;
-    addLogEvent('Drugs deal successful. You made $100.');
-    updateStats();
-}
-
-// Expand Territory
-function expandTerritory() {
-    if (money >= 1000) {
-        territory++;
-        money -= 1000;
-        addLogEvent('Territory expanded!');
-        updateStats();
-    } else {
-        addLogEvent('Not enough money to expand territory.');
-    }
-}
-
-// Sell Weapons
-function sellWeapons() {
-    if (weapons > 0) {
-        weapons--;
-        money += 200;
-        addLogEvent('Sold 1 weapon for $200.');
-        updateStats();
-    } else {
-        addLogEvent('You have no weapons to sell.');
-    }
-}
-
-// Launder Money
-function launderMoney() {
-    if (money < 1000) {
-        addLogEvent('Not enough money to launder.');
-        return;
-    }
-
-    if (launderingInProgress) {
-        addLogEvent('Money laundering is in progress. Please wait.');
-        return;
-    }
-
-    launderingInProgress = true;
-    addLogEvent('Money laundering started. It will take 10 seconds.');
-
-    setTimeout(() => {
-        money += 2000; // Laundering gives more money
-        addLogEvent('Money laundering completed. You received clean money!');
-        launderingInProgress = false;
-        updateStats();
-    }, 10000); // 10 seconds laundering time
-}
-
-// Level Up Boss
-function levelUpBoss() {
-    if (money < 5000) {
-        addLogEvent('You need more money to level up your boss.');
-        return;
-    }
-
-    money -= 5000;
-    bossLevel++;
-    addLogEvent(`Your boss leveled up to level ${bossLevel}. New abilities unlocked!`);
-    updateStats();
-}
-
-// Random Event Generator (Triggered Every 10 Seconds)
-function generateRandomEvent() {
-    const events = [
-        'A rival gang tried to take over one of your territories. You\'ve repelled them!',
-        'The police are closing in on one of your hideouts. You had to bribe them!',
-        'A new weapons shipment arrived. You\'ve expanded your armory!',
-        'A trusted crew member betrayed you. Lost some weapons and money!',
-        'Your drug deal went smoothly. Made a huge profit!'
-    ];
-
-    const randomEvent = events[Math.floor(Math.random() * events.length)];
-    addLogEvent(randomEvent);
-
-    // Random event impact
-    if (randomEvent.includes('profit')) {
-        money += 500;
-    } else if (randomEvent.includes('betrayed')) {
-        weapons -= 2;
-        money -= 100;
-    }
-    updateStats();
-}
-
-// Set Interval to Trigger Random Events Every 10 Seconds
-setInterval(generateRandomEvent, 10000);
