@@ -1,0 +1,183 @@
+<% layout('layout') %>
+
+<% contentFor('head') %>
+<style>
+    .creation-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        padding: 3rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .creation-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .creation-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #ff6b35;
+    }
+
+    .creation-header p {
+        opacity: 0.8;
+        font-size: 1.1rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+
+    .philosophy-description {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+        margin-top: 0.5rem;
+        font-style: italic;
+    }
+
+    .difficulty-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 0.5rem;
+    }
+
+    .difficulty-badge.easy {
+        background: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+    }
+
+    .difficulty-badge.normal {
+        background: rgba(255, 193, 7, 0.2);
+        color: #ffc107;
+    }
+
+    .difficulty-badge.hard {
+        background: rgba(255, 107, 53, 0.2);
+        color: #ff6b35;
+    }
+
+    .difficulty-badge.legendary {
+        background: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+    }
+
+    @media (max-width: 768px) {
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+<% endContentFor %>
+
+<div class="creation-container fade-in">
+    <div class="creation-header">
+        <h1><i class="fas fa-user-tie"></i> Create Your Coach</h1>
+        <p>Define your coaching identity and philosophy. These choices will affect your recruiting success and team development.</p>
+    </div>
+
+    <form action="/select-school" method="GET">
+        <div class="form-group">
+            <label for="coachName">Coach Name:</label>
+            <input type="text" id="coachName" name="coachName" placeholder="Enter your name" maxlength="25" required>
+        </div>
+
+        <div class="form-group">
+            <label for="coachingStyle">Coaching Philosophy:</label>
+            <select id="coachingStyle" name="coachingStyle" required>
+                <option value="offensive">Offensive Minded</option>
+                <option value="defensive">Defensive Guru</option>
+                <option value="balanced" selected>Balanced Attack</option>
+                <option value="recruiting">Recruiting Expert</option>
+            </select>
+            <div class="philosophy-description" id="philosophyDescription">
+                Excel in all phases of the game with no specific advantages or disadvantages.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="difficulty">Difficulty Level:</label>
+            <select id="difficulty" name="difficulty" required>
+                <option value="easy">Freshman <span class="difficulty-badge easy">Easy</span></option>
+                <option value="normal" selected>Varsity <span class="difficulty-badge normal">Normal</span></option>
+                <option value="hard">All-American <span class="difficulty-badge hard">Hard</span></option>
+                <option value="legendary">Legendary <span class="difficulty-badge legendary">Ultimate</span></option>
+            </select>
+            <div class="philosophy-description" id="difficultyDescription">
+                Balanced challenge with standard recruiting success rates and team development.
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="/" class="btn secondary">
+                <i class="fas fa-arrow-left"></i>
+                Back to Home
+            </a>
+            <button type="submit" class="btn primary">
+                <i class="fas fa-arrow-right"></i>
+                Choose School
+            </button>
+        </div>
+    </form>
+</div>
+
+<% contentFor('scripts') %>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const coachingStyleSelect = document.getElementById('coachingStyle');
+        const difficultySelect = document.getElementById('difficulty');
+        const philosophyDescription = document.getElementById('philosophyDescription');
+        const difficultyDescription = document.getElementById('difficultyDescription');
+
+        const philosophyDescriptions = {
+            offensive: 'Focus on high-scoring games. +10% offensive rating improvement, -5% defensive rating improvement.',
+            defensive: 'Build a strong defense. +10% defensive rating improvement, -5% offensive rating improvement.',
+            balanced: 'Excel in all phases of the game with no specific advantages or disadvantages.',
+            recruiting: 'Attract top talent more easily. +15% recruiting success rate, normal team development.'
+        };
+
+        const difficultyDescriptions = {
+            easy: 'Higher recruiting success rates and faster team development. Perfect for new coaches.',
+            normal: 'Balanced challenge with standard recruiting success rates and team development.',
+            hard: 'Realistic difficulty with lower recruiting success and slower development. For experienced coaches.',
+            legendary: 'Ultimate challenge with very low recruiting success and minimal development bonuses.'
+        };
+
+        function updateDescriptions() {
+            philosophyDescription.textContent = philosophyDescriptions[coachingStyleSelect.value];
+            difficultyDescription.textContent = difficultyDescriptions[difficultySelect.value];
+        }
+
+        coachingStyleSelect.addEventListener('change', updateDescriptions);
+        difficultySelect.addEventListener('change', updateDescriptions);
+
+        // Form validation
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const coachName = document.getElementById('coachName').value.trim();
+            if (coachName.length < 2) {
+                e.preventDefault();
+                alert('Coach name must be at least 2 characters long.');
+                return;
+            }
+            if (coachName.length > 25) {
+                e.preventDefault();
+                alert('Coach name must be 25 characters or less.');
+                return;
+            }
+        });
+
+        // Focus on name input
+        document.getElementById('coachName').focus();
+    });
+</script>
+<% endContentFor %>

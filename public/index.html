@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Football Dynasty Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="screen active">
+        <div class="loading-container">
+            <div class="football-field">
+                <div class="football-animation">
+                    <i class="fas fa-football-ball"></i>
+                </div>
+            </div>
+            <h1>College Football Dynasty Manager</h1>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <p class="loading-text">Loading game assets...</p>
+        </div>
+    </div>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen">
+        <div class="menu-background">
+            <div class="stadium-lights"></div>
+        </div>
+        <div class="menu-container">
+            <div class="game-logo">
+                <i class="fas fa-football-ball"></i>
+                <h1>Dynasty Manager</h1>
+                <p class="tagline">Build Your Championship Legacy</p>
+            </div>
+            <div class="menu-options">
+                <button class="menu-btn primary" onclick="startNewCareer()">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Career</span>
+                </button>
+                <button class="menu-btn" onclick="showLoadGame()" disabled>
+                    <i class="fas fa-folder-open"></i>
+                    <span>Load Career</span>
+                </button>
+                <button class="menu-btn" onclick="showSettings()">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+                <button class="menu-btn" onclick="showCredits()">
+                    <i class="fas fa-info-circle"></i>
+                    <span>About</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coach Creation Screen -->
+    <div id="coach-creation" class="screen">
+        <div class="creation-container">
+            <h2><i class="fas fa-user-tie"></i> Create Your Coach</h2>
+            <div class="coach-form">
+                <div class="form-group">
+                    <label for="coach-name">Coach Name:</label>
+                    <input type="text" id="coach-name" placeholder="Enter your name" maxlength="20">
+                </div>
+                <div class="form-group">
+                    <label for="coaching-style">Coaching Philosophy:</label>
+                    <select id="coaching-style">
+                        <option value="offensive">Offensive Minded - Focus on high-scoring games</option>
+                        <option value="defensive">Defensive Guru - Build a strong defense</option>
+                        <option value="balanced">Balanced Attack - Excel in all phases</option>
+                        <option value="recruiting">Recruiting Expert - Attract top talent</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="difficulty">Difficulty:</label>
+                    <select id="difficulty">
+                        <option value="easy">Freshman - Easy recruiting and gameplay</option>
+                        <option value="normal" selected>Varsity - Balanced challenge</option>
+                        <option value="hard">All-American - Realistic difficulty</option>
+                        <option value="legendary">Legendary - Ultimate challenge</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn secondary" onclick="showMainMenu()">Back</button>
+                <button class="btn primary" onclick="showSchoolSelection()">Next: Choose School</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- School Selection Screen -->
+    <div id="school-selection" class="screen">
+        <div class="selection-header">
+            <h2><i class="fas fa-university"></i> Choose Your Program</h2>
+            <div class="filter-controls">
+                <select id="conference-filter">
+                    <option value="all">All Conferences</option>
+                    <option value="SEC">SEC</option>
+                    <option value="Big Ten">Big Ten</option>
+                    <option value="Big 12">Big 12</option>
+                    <option value="ACC">ACC</option>
+                    <option value="Pac-12">Pac-12</option>
+                </select>
+                <select id="prestige-filter">
+                    <option value="all">All Prestige Levels</option>
+                    <option value="elite">Elite Programs (★★★★★)</option>
+                    <option value="good">Good Programs (★★★★☆)</option>
+                    <option value="average">Average Programs (★★★☆☆)</option>
+                    <option value="rebuilding">Rebuilding Programs (★★☆☆☆)</option>
+                </select>
+            </div>
+        </div>
+        <div class="schools-grid" id="schools-grid">
+            <!-- Schools populated by JavaScript -->
+        </div>
+        <div class="selection-actions">
+            <button class="btn secondary" onclick="showCoachCreation()">Back</button>
+        </div>
+    </div>
+
+    <!-- Main Game Dashboard -->
+    <div id="game-dashboard" class="screen">
+        <nav class="game-nav">
+            <div class="nav-left">
+                <div class="school-info">
+                    <div class="school-logo" id="nav-school-logo">TEAM</div>
+                    <div class="school-details">
+                        <h3 id="nav-school-name">School Name</h3>
+                        <p id="nav-record">0-0 (0-0)</p>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-center">
+                <div class="season-info">
+                    <h2 id="current-season">2024 Season</h2>
+                    <p id="current-week">Week 1 • Pre-Season</p>
+                </div>
+            </div>
+            <div class="nav-right">
+                <div class="coach-info">
+                    <h3 id="nav-coach-name">Coach Name</h3>
+                    <div class="prestige-stars" id="nav-prestige">★★★☆☆</div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="dashboard-sidebar">
+            <div class="sidebar-menu">
+                <button class="sidebar-btn active" data-screen="overview" onclick="showDashboardScreen('overview')">
+                    <i class="fas fa-home"></i>
+                    <span>Overview</span>
+                </button>
+                <button class="sidebar-btn" data-screen="team" onclick="showDashboardScreen('team')">
+                    <i class="fas fa-users"></i>
+                    <span>Team</span>
+                </button>
+                <button class="sidebar-btn" data-screen="recruiting" onclick="showDashboardScreen('recruiting')">
+                    <i class="fas fa-search"></i>
+                    <span>Recruiting</span>
+                </button>
+                <button class="sidebar-btn" data-screen="schedule" onclick="showDashboardScreen('schedule')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Schedule</span>
+                </button>
+                <button class="sidebar-btn" data-screen="coaching" onclick="showDashboardScreen('coaching')">
+                    <i class="fas fa-chalkboard"></i>
+                    <span>Coaching</span>
+                </button>
+                <button class="sidebar-btn" data-screen="facilities" onclick="showDashboardScreen('facilities')">
+                    <i class="fas fa-building"></i>
+                    <span>Facilities</span>
+                </button>
+                <button class="sidebar-btn" data-screen="stats" onclick="showDashboardScreen('stats')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Statistics</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <!-- Overview Screen -->
+            <div id="overview-screen" class="dashboard-screen active">
+                <div class="overview-grid">
+                    <div class="overview-card team-status">
+                        <h3><i class="fas fa-trophy"></i> Team Status</h3>
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="label">Overall Rating</span>
+                                <span class="value" id="overall-rating">75</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Team Chemistry</span>
+                                <span class="value" id="team-chemistry">68</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Discipline</span>
+                                <span class="value" id="team-discipline">82</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="label">Morale</span>
+                                <span class="value" id="team-morale">75</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-card next-game">
+                        <h3><i class="fas fa-gamepad"></i> Next Game</h3>
+                        <div id="next-game-info">
+                            <div class="game-matchup">
+                                <div class="team home-team">
+                                    <div class="team-logo" id="next-home-logo">HOME</div>
+                                    <span id="next-home-name">Home Team</span>
+                                </div>
+                                <div class="vs">VS</div>
+                                <div class="team away-team">
+                                    <div class="team-logo" id="next-away-logo">AWAY</div>
+                                    <span id="next-away-name">Away Team</span>
+                                </div>
+                            </div>
+                            <div class="game-details">
+                                <p id="next-game-date">Week 1 • Saturday</p>
+                                <p id="next-game-time">3:30 PM ET</p>
+                            </div>
+                            <button class="btn primary" id="simulate-game-btn" onclick="simulateGame()">
+                                <i class="fas fa-play"></i> Simulate Game
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overview-card recruiting-board">
+                        <h3><i class="fas fa-star"></i> Top Recruits</h3>
+                        <div id="top-recruits-list">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                        <button class="btn secondary" onclick="showDashboardScreen('recruiting')">
+                            View All Recruits
+                        </button>
+                    </div>
+
+                    <div class="overview-card recent-news">
+                        <h3><i class="fas fa-newspaper"></i> Program News</h3>
+                        <div id="news-feed">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Management Screen -->
+            <div id="team-screen" class="dashboard-screen">
+                <div class="team-header">
+                    <h2><i class="fas fa-users"></i> Team Management</h2>
+                    <div class="team-tabs">
+                        <button class="tab-btn active" onclick="showTeamTab('roster')">Roster</button>
+                        <button class="tab-btn" onclick="showTeamTab('depth')">Depth Chart</button>
+                        <button class="tab-btn" onclick="showTeamTab('training')">Training</button>
+                    </div>
+                </div>
+
+                <div id="roster-tab" class="team-tab active">
+                    <div class="roster-controls">
+                        <select id="position-filter">
+                            <option value="all">All Positions</option>
+                            <option value="QB">Quarterbacks</option>
+                            <option value="RB">Running Backs</option>
+                            <option value="WR">Wide Receivers</option>
+                            <option value="TE">Tight Ends</option>
+                            <option value="OL">Offensive Line</option>
+                            <option value="DL">Defensive Line</option>
+                            <option value="LB">Linebackers</option>
+                            <option value="DB">Defensive Backs</option>
+                            <option value="K">Kickers</option>
+                        </select>
+                    </div>
+                    <div class="roster-grid" id="roster-grid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div id="depth-tab" class="team-tab">
+                    <div class="depth-chart" id="depth-chart">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div id="training-tab" class="team-tab">
+                    <div class="training-options">
+                        <div class="training-card" onclick="startTraining('offense')">
+                            <i class="fas fa-running"></i>
+                            <h4>Offensive Practice</h4>
+                            <p>Improve passing, rushing, and scoring ability</p>
+                            <div class="training-cost">Cost: 1 Practice Point</div>
+                        </div>
+                        <div class="training-card" onclick="startTraining('defense')">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4>Defensive Practice</h4>
+                            <p>Enhance tackling, coverage, and pressure</p>
+                            <div class="training-cost">Cost: 1 Practice Point</div>
+                        </div>
+                        <div class="training-card" onclick="startTraining('special')">
+                            <i class="fas fa-futbol"></i>
+                            <h4>Special Teams</h4>
+                            <p>Work on kicking, punting, and returns</p>
+                            <div class="training-cost">Cost: 1 Practice Point</div>
+                        </div>
+                        <div class="training-card" onclick="startTraining('conditioning')">
+                            <i class="fas fa-heartbeat"></i>
+                            <h4>Conditioning</h4>
+                            <p>Build stamina and reduce injuries</p>
+                            <div class="training-cost">Cost: 1 Practice Point</div>
+                        </div>
+                    </div>
+                    <div class="practice-points">
+                        <h4>Practice Points Available: <span id="practice-points">3</span></h4>
+                        <p>Practice points refresh each week</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recruiting Screen -->
+            <div id="recruiting-screen" class="dashboard-screen">
+                <div class="recruiting-header">
+                    <h2><i class="fas fa-search"></i> Recruiting Center</h2>
+                    <div class="recruiting-stats">
+                        <div class="stat">
+                            <span class="label">Recruiting Points</span>
+                            <span class="value" id="recruiting-points">100</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Scholarships Available</span>
+                            <span class="value" id="scholarships-available">25</span>
+                        </div>
+                        <div class="stat">
+                            <span class="label">Commits</span>
+                            <span class="value" id="current-commits">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recruiting-filters">
+                    <select id="recruit-position-filter">
+                        <option value="all">All Positions</option>
+                        <option value="QB">Quarterbacks</option>
+                        <option value="RB">Running Backs</option>
+                        <option value="WR">Wide Receivers</option>
+                        <option value="TE">Tight Ends</option>
+                        <option value="OL">Offensive Line</option>
+                        <option value="DL">Defensive Line</option>
+                        <option value="LB">Linebackers</option>
+                        <option value="DB">Defensive Backs</option>
+                        <option value="K">Kickers</option>
+                    </select>
+                    <select id="recruit-star-filter">
+                        <option value="all">All Star Ratings</option>
+                        <option value="5">5-Star Recruits</option>
+                        <option value="4">4-Star Recruits</option>
+                        <option value="3">3-Star Recruits</option>
+                        <option value="2">2-Star Recruits</option>
+                    </select>
+                    <select id="recruit-interest-filter">
+                        <option value="all">All Interest Levels</option>
+                        <option value="high">High Interest</option>
+                        <option value="medium">Medium Interest</option>
+                        <option value="low">Low Interest</option>
+                    </select>
+                </div>
+
+                <div class="recruits-grid" id="recruits-grid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Other screens will be added here -->
+            <div id="schedule-screen" class="dashboard-screen">
+                <h2><i class="fas fa-calendar-alt"></i> Schedule & Results</h2>
+                <div class="schedule-container" id="schedule-container">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <div id="coaching-screen" class="dashboard-screen">
+                <h2><i class="fas fa-chalkboard"></i> Coaching Staff</h2>
+                <div class="coaching-staff" id="coaching-staff">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <div id="facilities-screen" class="dashboard-screen">
+                <h2><i class="fas fa-building"></i> Facilities</h2>
+                <div class="facilities-grid" id="facilities-grid">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <div id="stats-screen" class="dashboard-screen">
+                <h2><i class="fas fa-chart-bar"></i> Statistics</h2>
+                <div class="stats-container" id="stats-container">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Simulation Modal -->
+    <div id="game-simulation-modal" class="modal">
+        <div class="modal-content game-sim">
+            <div class="simulation-header">
+                <h2 id="sim-matchup">Team A vs Team B</h2>
+                <p id="sim-game-info">Week 1 • Saturday 3:30 PM</p>
+            </div>
+            
+            <div class="simulation-progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="sim-progress"></div>
+                </div>
+                <p id="sim-status">Preparing for kickoff...</p>
+            </div>
+
+            <div class="game-scoreboard" id="game-scoreboard">
+                <div class="team-score">
+                    <div class="team-info">
+                        <div class="team-logo" id="sim-home-logo">HOME</div>
+                        <h3 id="sim-home-name">Home Team</h3>
+                    </div>
+                    <div class="score" id="sim-home-score">0</div>
+                </div>
+                <div class="game-clock">
+                    <div class="quarter" id="sim-quarter">1st</div>
+                    <div class="time" id="sim-time">15:00</div>
+                </div>
+                <div class="team-score">
+                    <div class="team-info">
+                        <div class="team-logo" id="sim-away-logo">AWAY</div>
+                        <h3 id="sim-away-name">Away Team</h3>
+                    </div>
+                    <div class="score" id="sim-away-score">0</div>
+                </div>
+            </div>
+
+            <div class="play-by-play" id="play-by-play">
+                <!-- Populated during simulation -->
+            </div>
+
+            <div class="simulation-actions">
+                <button class="btn secondary" id="skip-sim-btn" onclick="skipSimulation()">Skip to Result</button>
+                <button class="btn primary" id="continue-btn" onclick="continueFromGame()" style="display: none;">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recruiting Modal -->
+    <div id="recruiting-modal" class="modal">
+        <div class="modal-content">
+            <div class="recruit-profile" id="recruit-profile">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
