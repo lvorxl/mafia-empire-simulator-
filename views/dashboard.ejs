@@ -1,0 +1,418 @@
+<% layout('layout') %>
+
+<% contentFor('head') %>
+<style>
+    .dashboard-header {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .school-info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .school-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .school-details h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        color: #ff6b35;
+    }
+
+    .season-info {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .season-stat {
+        text-align: center;
+    }
+
+    .season-stat .label {
+        display: block;
+        opacity: 0.8;
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .season-stat .value {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #ff6b35;
+    }
+
+    .dashboard-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dashboard-card h3 {
+        color: #ff6b35;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .team-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+    }
+
+    .stat-value {
+        font-weight: 600;
+        color: #ff6b35;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .next-game {
+        text-align: center;
+        padding: 1.5rem;
+        background: rgba(255, 107, 53, 0.1);
+        border-radius: 10px;
+        border: 1px solid rgba(255, 107, 53, 0.3);
+    }
+
+    .next-game h4 {
+        color: #ff6b35;
+        margin-bottom: 1rem;
+    }
+
+    .matchup {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        margin: 1rem 0;
+    }
+
+    .team {
+        text-align: center;
+    }
+
+    .team-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        margin: 0 auto 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .vs {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ff6b35;
+    }
+
+    .news-item {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border-left: 3px solid #ff6b35;
+    }
+
+    .news-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .resources {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .resource {
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 8px;
+        flex: 1;
+        margin: 0 0.5rem;
+    }
+
+    .resource .value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ff6b35;
+        display: block;
+    }
+
+    .resource .label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    @media (max-width: 768px) {
+        .school-info {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .season-info {
+            gap: 1rem;
+        }
+        
+        .dashboard-content {
+            grid-template-columns: 1fr;
+        }
+        
+        .matchup {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .actions {
+            flex-direction: column;
+        }
+    }
+</style>
+<% endContentFor %>
+
+<div class="fade-in">
+    <div class="dashboard-header">
+        <div class="school-info">
+            <div class="school-logo" style="background: linear-gradient(45deg, <%= gameState.school.colors[0] %>, <%= gameState.school.colors[1] %>);">
+                <%= gameState.school.abbreviation %>
+            </div>
+            <div class="school-details">
+                <h1><%= gameState.school.nickname %> Dynasty</h1>
+                <p>Coach <%= gameState.coach.name %> • <%= gameState.season %> Season</p>
+            </div>
+        </div>
+        
+        <div class="season-info">
+            <div class="season-stat">
+                <span class="label">Record</span>
+                <span class="value"><%= gameState.record.wins %>-<%= gameState.record.losses %></span>
+            </div>
+            <div class="season-stat">
+                <span class="label">Conference</span>
+                <span class="value"><%= gameState.record.confWins %>-<%= gameState.record.confLosses %></span>
+            </div>
+            <div class="season-stat">
+                <span class="label">Week</span>
+                <span class="value"><%= gameState.week %></span>
+            </div>
+            <div class="season-stat">
+                <span class="label">Overall Rating</span>
+                <span class="value"><%= gameState.team.overall %></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <!-- Team Status -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-users"></i> Team Status</h3>
+            <div class="team-stats">
+                <div class="stat-item">
+                    <span>Offense</span>
+                    <span class="stat-value"><%= gameState.team.offense %></span>
+                </div>
+                <div class="stat-item">
+                    <span>Defense</span>
+                    <span class="stat-value"><%= gameState.team.defense %></span>
+                </div>
+                <div class="stat-item">
+                    <span>Special Teams</span>
+                    <span class="stat-value"><%= gameState.team.specialTeams %></span>
+                </div>
+                <div class="stat-item">
+                    <span>Chemistry</span>
+                    <span class="stat-value"><%= gameState.team.chemistry %></span>
+                </div>
+                <div class="stat-item">
+                    <span>Discipline</span>
+                    <span class="stat-value"><%= gameState.team.discipline %></span>
+                </div>
+                <div class="stat-item">
+                    <span>Morale</span>
+                    <span class="stat-value"><%= gameState.team.morale %></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-coins"></i> Resources</h3>
+            <div class="resources">
+                <div class="resource">
+                    <span class="value"><%= gameState.resources.practicePoints %></span>
+                    <span class="label">Practice Points</span>
+                </div>
+                <div class="resource">
+                    <span class="value"><%= gameState.resources.recruitingPoints %></span>
+                    <span class="label">Recruiting Points</span>
+                </div>
+                <div class="resource">
+                    <span class="value"><%= gameState.resources.scholarships %></span>
+                    <span class="label">Scholarships</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Next Game -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-gamepad"></i> Next Game</h3>
+            <% 
+                const nextGame = gameState.schedule.find(game => !game.played);
+                if (nextGame) {
+                    const homeTeam = nextGame.isHome ? gameState.school : nextGame.opponent;
+                    const awayTeam = nextGame.isHome ? nextGame.opponent : gameState.school;
+            %>
+                <div class="next-game">
+                    <h4>Week <%= nextGame.week %></h4>
+                    <div class="matchup">
+                        <div class="team">
+                            <div class="team-logo" style="background: linear-gradient(45deg, <%= awayTeam.colors[0] %>, <%= awayTeam.colors[1] %>);">
+                                <%= awayTeam.abbreviation %>
+                            </div>
+                            <div><%= awayTeam.nickname %></div>
+                        </div>
+                        <div class="vs">@</div>
+                        <div class="team">
+                            <div class="team-logo" style="background: linear-gradient(45deg, <%= homeTeam.colors[0] %>, <%= homeTeam.colors[1] %>);">
+                                <%= homeTeam.abbreviation %>
+                            </div>
+                            <div><%= homeTeam.nickname %></div>
+                        </div>
+                    </div>
+                    <p><%= nextGame.isConference ? 'Conference Game' : 'Non-Conference' %></p>
+                </div>
+            <% } else { %>
+                <p>Season Complete!</p>
+            <% } %>
+        </div>
+
+        <!-- Recent News -->
+        <div class="dashboard-card">
+            <h3><i class="fas fa-newspaper"></i> Recent News</h3>
+            <div class="news-feed">
+                <% gameState.news.slice(-5).reverse().forEach(function(newsItem) { %>
+                    <div class="news-item">
+                        <p><%= newsItem.message %></p>
+                        <small>Week <%= newsItem.week %></small>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <% if (gameState.schedule.find(game => !game.played)) { %>
+            <form action="/simulate-game" method="POST" style="display: inline;">
+                <button type="submit" class="btn primary">
+                    <i class="fas fa-play"></i>
+                    Simulate Next Game
+                </button>
+            </form>
+        <% } %>
+        
+        <% if (gameState.resources.practicePoints > 0) { %>
+            <form action="/practice" method="POST" style="display: inline;">
+                <input type="hidden" name="type" value="balanced">
+                <button type="submit" class="btn secondary">
+                    <i class="fas fa-dumbbell"></i>
+                    Practice Team (<%= gameState.resources.practicePoints %> points)
+                </button>
+            </form>
+        <% } %>
+        
+        <% if (gameState.resources.recruitingPoints > 0 && gameState.resources.scholarships > 0) { %>
+            <a href="/dashboard?view=recruiting" class="btn secondary">
+                <i class="fas fa-search"></i>
+                Recruit Players
+            </a>
+        <% } %>
+        
+        <form action="/advance-week" method="POST" style="display: inline;">
+            <button type="submit" class="btn secondary">
+                <i class="fas fa-forward"></i>
+                Advance Week
+            </button>
+        </form>
+    </div>
+</div>
+
+<% contentFor('scripts') %>
+<script>
+    // Add some interactivity
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate stat values
+        const statValues = document.querySelectorAll('.stat-value, .value');
+        statValues.forEach(stat => {
+            const value = parseInt(stat.textContent);
+            if (!isNaN(value)) {
+                stat.style.color = value >= 80 ? '#28a745' : value >= 60 ? '#ffc107' : '#dc3545';
+            }
+        });
+
+        // Add confirmation for important actions
+        const simulateBtn = document.querySelector('button[type="submit"]');
+        if (simulateBtn && simulateBtn.textContent.includes('Simulate')) {
+            simulateBtn.addEventListener('click', function(e) {
+                const confirmed = confirm('Are you ready to simulate the next game?');
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
+<% endContentFor %>

@@ -1,0 +1,107 @@
+<% layout('layout') %>
+
+<% contentFor('head') %>
+<style>
+    .error-container {
+        max-width: 600px;
+        margin: 4rem auto;
+        text-align: center;
+    }
+
+    .error-icon {
+        font-size: 6rem;
+        color: #dc3545;
+        margin-bottom: 2rem;
+    }
+
+    .error-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #dc3545;
+        margin-bottom: 1rem;
+    }
+
+    .error-message {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 3rem;
+        line-height: 1.6;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .error-title {
+            font-size: 2rem;
+        }
+        
+        .error-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+</style>
+<% endContentFor %>
+
+<div class="error-container fade-in">
+    <div class="error-icon">
+        <% if (title.includes('404')) { %>
+            <i class="fas fa-search"></i>
+        <% } else { %>
+            <i class="fas fa-exclamation-triangle"></i>
+        <% } %>
+    </div>
+    
+    <h1 class="error-title">
+        <% if (title.includes('404')) { %>
+            Page Not Found
+        <% } else { %>
+            Oops! Something Went Wrong
+        <% } %>
+    </h1>
+    
+    <p class="error-message">
+        <% if (title.includes('404')) { %>
+            The page you're looking for doesn't exist. It might have been moved, deleted, or you entered the wrong URL.
+        <% } else { %>
+            <%= error %>
+            <br><br>
+            Don't worry - your dynasty progress is safe! Try refreshing the page or go back to the dashboard.
+        <% } %>
+    </p>
+    
+    <div class="error-actions">
+        <a href="/" class="btn primary">
+            <i class="fas fa-home"></i>
+            Go Home
+        </a>
+        
+        <% if (!title.includes('404')) { %>
+            <button onclick="window.location.reload()" class="btn secondary">
+                <i class="fas fa-refresh"></i>
+                Try Again
+            </button>
+        <% } %>
+        
+        <button onclick="window.history.back()" class="btn secondary">
+            <i class="fas fa-arrow-left"></i>
+            Go Back
+        </button>
+    </div>
+</div>
+
+<% contentFor('scripts') %>
+<script>
+    // Auto-redirect to home after 30 seconds for 404 errors
+    <% if (title.includes('404')) { %>
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 30000);
+    <% } %>
+</script>
+<% endContentFor %>

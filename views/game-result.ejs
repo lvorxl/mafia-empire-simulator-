@@ -1,0 +1,338 @@
+<% layout('layout') %>
+
+<% contentFor('head') %>
+<style>
+    .result-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        text-align: center;
+    }
+
+    .result-header {
+        background: <%= gameResult.result.won ? 'rgba(40, 167, 69, 0.1)' : 'rgba(220, 53, 69, 0.1)' %>;
+        border: 2px solid <%= gameResult.result.won ? '#28a745' : '#dc3545' %>;
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 2rem;
+    }
+
+    .result-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: <%= gameResult.result.won ? '#28a745' : '#dc3545' %>;
+        margin-bottom: 1rem;
+    }
+
+    .game-info {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .scoreboard {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 3rem;
+        margin: 2rem 0;
+    }
+
+    .team-score {
+        text-align: center;
+    }
+
+    .team-logo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 2rem;
+        color: white;
+        margin: 0 auto 1rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .team-name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .score {
+        font-size: 4rem;
+        font-weight: 800;
+        color: #ff6b35;
+    }
+
+    .vs-divider {
+        font-size: 2rem;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .game-stats {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+
+    .game-stats h3 {
+        color: #ff6b35;
+        margin-bottom: 1rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .stat-box {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ff6b35;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+
+    .impact-summary {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        padding: 2rem;
+        margin: 2rem 0;
+        text-align: left;
+    }
+
+    .impact-summary h3 {
+        color: #ff6b35;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    .impact-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .impact-item:last-child {
+        border-bottom: none;
+    }
+
+    .impact-change {
+        font-weight: bold;
+    }
+
+    .impact-change.positive {
+        color: #28a745;
+    }
+
+    .impact-change.negative {
+        color: #dc3545;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 3rem;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .scoreboard {
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .vs-divider {
+            transform: rotate(90deg);
+        }
+        
+        .result-title {
+            font-size: 2rem;
+        }
+        
+        .actions {
+            flex-direction: column;
+        }
+    }
+</style>
+<% endContentFor %>
+
+<div class="result-container fade-in">
+    <div class="result-header">
+        <div class="result-title">
+            <%= gameResult.result.won ? '🎉 VICTORY!' : '😞 DEFEAT' %>
+        </div>
+        <div class="game-info">
+            Week <%= gameResult.game.week %> • 
+            <%= gameResult.game.isConference ? 'Conference Game' : 'Non-Conference' %>
+        </div>
+        
+        <div class="scoreboard">
+            <% 
+                const homeTeam = gameResult.game.isHome ? gameState.school : gameResult.game.opponent;
+                const awayTeam = gameResult.game.isHome ? gameResult.game.opponent : gameState.school;
+                const homeScore = gameResult.game.isHome ? gameResult.result.playerScore : gameResult.result.opponentScore;
+                const awayScore = gameResult.game.isHome ? gameResult.result.opponentScore : gameResult.result.playerScore;
+            %>
+            
+            <div class="team-score">
+                <div class="team-logo" style="background: linear-gradient(45deg, <%= awayTeam.colors[0] %>, <%= awayTeam.colors[1] %>);">
+                    <%= awayTeam.abbreviation %>
+                </div>
+                <div class="team-name"><%= awayTeam.nickname %></div>
+                <div class="score"><%= awayScore %></div>
+            </div>
+            
+            <div class="vs-divider">@</div>
+            
+            <div class="team-score">
+                <div class="team-logo" style="background: linear-gradient(45deg, <%= homeTeam.colors[0] %>, <%= homeTeam.colors[1] %>);">
+                    <%= homeTeam.abbreviation %>
+                </div>
+                <div class="team-name"><%= homeTeam.nickname %></div>
+                <div class="score"><%= homeScore %></div>
+            </div>
+        </div>
+    </div>
+
+    <% if (gameResult.result.stats) { %>
+        <div class="game-stats">
+            <h3><i class="fas fa-chart-bar"></i> Game Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <span class="stat-value"><%= gameResult.result.stats.totalYards %></span>
+                    <span class="stat-label">Total Yards</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value"><%= gameResult.result.stats.passingYards %></span>
+                    <span class="stat-label">Passing Yards</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value"><%= gameResult.result.stats.rushingYards %></span>
+                    <span class="stat-label">Rushing Yards</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-value"><%= gameResult.result.stats.turnovers %></span>
+                    <span class="stat-label">Turnovers</span>
+                </div>
+            </div>
+        </div>
+    <% } %>
+
+    <div class="impact-summary">
+        <h3><i class="fas fa-chart-line"></i> Impact on Program</h3>
+        <div class="impact-item">
+            <span>Season Record</span>
+            <span class="impact-change">
+                <%= gameState.record.wins %>-<%= gameState.record.losses %>
+                (<%= gameState.record.confWins %>-<%= gameState.record.confLosses %> Conference)
+            </span>
+        </div>
+        <div class="impact-item">
+            <span>Team Morale</span>
+            <span class="impact-change <%= gameResult.result.won ? 'positive' : 'negative' %>">
+                <%= gameResult.result.won ? '+' : '' %><%= gameResult.result.won ? Math.floor(Math.random() * 5) + 2 : -(Math.floor(Math.random() * 5) + 2) %> points
+            </span>
+        </div>
+        <div class="impact-item">
+            <span>Team Chemistry</span>
+            <span class="impact-change <%= gameResult.result.won ? 'positive' : '' %>">
+                <%= gameResult.result.won ? '+' + (Math.floor(Math.random() * 3) + 1) + ' points' : 'No change' %>
+            </span>
+        </div>
+        <div class="impact-item">
+            <span>Recruiting Impact</span>
+            <span class="impact-change <%= gameResult.result.won ? 'positive' : 'negative' %>">
+                <%= gameResult.result.won ? 'Positive boost' : 'Slight decline' %>
+            </span>
+        </div>
+    </div>
+
+    <div class="actions">
+        <form action="/advance-week" method="POST" style="display: inline;">
+            <button type="submit" class="btn primary">
+                <i class="fas fa-forward"></i>
+                Continue to Next Week
+            </button>
+        </form>
+        
+        <a href="/dashboard" class="btn secondary">
+            <i class="fas fa-tachometer-alt"></i>
+            Return to Dashboard
+        </a>
+    </div>
+</div>
+
+<% contentFor('scripts') %>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add celebration effect for wins
+        <% if (gameResult.result.won) { %>
+            // Create confetti effect
+            function createConfetti() {
+                const colors = ['#ff6b35', '#28a745', '#ffd700', '#ffffff'];
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-10px';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.pointerEvents = 'none';
+                confetti.style.zIndex = '1000';
+                confetti.style.borderRadius = '50%';
+                
+                document.body.appendChild(confetti);
+                
+                const animation = confetti.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(100vh) rotate(360deg)`, opacity: 0 }
+                ], {
+                    duration: 3000,
+                    easing: 'linear'
+                });
+                
+                animation.onfinish = () => confetti.remove();
+            }
+            
+            // Create confetti burst
+            for (let i = 0; i < 50; i++) {
+                setTimeout(createConfetti, i * 100);
+            }
+        <% } %>
+        
+        // Auto-advance after 10 seconds if user doesn't interact
+        let autoAdvanceTimer = setTimeout(() => {
+            const continueBtn = document.querySelector('button[type="submit"]');
+            if (continueBtn) {
+                continueBtn.click();
+            }
+        }, 10000);
+        
+        // Cancel auto-advance if user interacts
+        document.addEventListener('click', () => {
+            clearTimeout(autoAdvanceTimer);
+        });
+    });
+</script>
+<% endContentFor %>
