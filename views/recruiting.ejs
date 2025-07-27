@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recruiting - <%= gameState.school.nickname %></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a2332 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .school-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .school-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .school-details h2 {
+            color: #ff6b35;
+            margin-bottom: 0.25rem;
+        }
+        
+        .nav-menu {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 107, 53, 0.2);
+            color: #ff6b35;
+        }
+        
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #ff6b35;
+            margin-bottom: 2rem;
+        }
+        
+        .recruiting-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-card h4 {
+            color: #ff6b35;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        
+        .recruits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .recruit-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .recruit-card:hover {
+            transform: translateY(-3px);
+            border-color: #ff6b35;
+        }
+        
+        .recruit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .recruit-info h4 {
+            color: #ff6b35;
+            margin-bottom: 0.25rem;
+        }
+        
+        .recruit-position {
+            background: rgba(255, 107, 53, 0.2);
+            color: #ff6b35;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .recruit-rating {
+            text-align: right;
+        }
+        
+        .stars {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+        
+        .rating-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b35;
+        }
+        
+        .recruit-details {
+            margin-bottom: 1rem;
+        }
+        
+        .interest-level {
+            padding: 0.5rem;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        
+        .interest-high {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .interest-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .interest-low {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        .recruit-actions {
+            text-align: center;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .actions {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .alert.success {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            color: #28a745;
+        }
+        
+        .alert.error {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+        
+        .recruited {
+            opacity: 0.5;
+            border-color: #28a745;
+        }
+        
+        .recruited::after {
+            content: "✓ RECRUITED";
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(40, 167, 69, 0.8);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .recruit-card {
+            position: relative;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .recruiting-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .recruits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="school-info">
+            <div class="school-logo" style="background: linear-gradient(45deg, <%= gameState.school.colors[0] %>, <%= gameState.school.colors[1] %>);">
+                <%= gameState.school.abbreviation %>
+            </div>
+            <div class="school-details">
+                <h2><%= gameState.school.nickname %> Dynasty</h2>
+                <div>Coach <%= gameState.coach.name %> • <%= gameState.season %> Season</div>
+            </div>
+        </div>
+        <div class="season-info">
+            <div class="record"><%= gameState.record.wins %>-<%= gameState.record.losses %></div>
+            <div>Week <%= gameState.week %></div>
+        </div>
+    </div>
+    
+    <nav class="nav-menu">
+        <a href="/game" class="nav-link">🏠 Dashboard</a>
+        <a href="/team" class="nav-link">👥 Team</a>
+        <a href="/recruiting" class="nav-link active">🔍 Recruiting</a>
+        <a href="/schedule" class="nav-link">📅 Schedule</a>
+    </nav>
+    
+    <div class="container">
+        <h1 class="page-title">🔍 Recruiting</h1>
+        
+        <% if (typeof result !== 'undefined') { %>
+            <div class="alert <%= result === 'success' ? 'success' : 'error' %>">
+                <% if (result === 'success') { %>
+                    Recruitment successful! The player has joined your program.
+                <% } else { %>
+                    Recruitment failed. The player chose another program or you don't have enough resources.
+                <% } %>
+            </div>
+        <% } %>
+        
+        <div class="recruiting-stats">
+            <div class="stat-card">
+                <h4>💰 Recruiting Points</h4>
+                <div class="stat-value"><%= gameState.resources.recruitingPoints %></div>
+            </div>
+            
+            <div class="stat-card">
+                <h4>🎓 Commits</h4>
+                <div class="stat-value"><%= gameState.recruits.filter(r => r.recruited).length %></div>
+            </div>
+            
+            <div class="stat-card">
+                <h4>🎯 Available</h4>
+                <div class="stat-value"><%= gameState.recruits.filter(r => !r.recruited).length %></div>
+            </div>
+        </div>
+        
+        <div class="recruits-grid">
+            <% gameState.recruits.forEach(function(recruit) { %>
+                <div class="recruit-card <%= recruit.recruited ? 'recruited' : '' %>">
+                    <div class="recruit-header">
+                        <div class="recruit-info">
+                            <h4><%= recruit.name %></h4>
+                            <div class="recruit-position"><%= recruit.position %></div>
+                        </div>
+                        <div class="recruit-rating">
+                            <div class="stars">
+                                <% for(let i = 0; i < recruit.stars; i++) { %>★<% } %>
+                                <% for(let i = recruit.stars; i < 5; i++) { %>☆<% } %>
+                            </div>
+                            <div class="rating-number"><%= recruit.rating %></div>
+                        </div>
+                    </div>
+                    
+                    <div class="recruit-details">
+                        <div class="interest-level interest-<%= recruit.interest >= 70 ? 'high' : recruit.interest >= 40 ? 'medium' : 'low' %>">
+                            Interest: <%= recruit.interest %>% 
+                            (<%= recruit.interest >= 70 ? 'High' : recruit.interest >= 40 ? 'Medium' : 'Low' %>)
+                        </div>
+                    </div>
+                    
+                    <% if (!recruit.recruited) { %>
+                        <div class="recruit-actions">
+                            <% const cost = Math.floor(recruit.rating / 10); %>
+                            <form action="/recruit/<%= recruit.id %>" method="POST" style="display: inline;">
+                                <button type="submit" class="btn" <%= gameState.resources.recruitingPoints < cost ? 'disabled' : '' %>>
+                                    Recruit (<%= cost %> pts)
+                                </button>
+                            </form>
+                        </div>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+        
+        <div class="actions">
+            <a href="/game" class="btn secondary">🏠 Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
