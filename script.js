@@ -28,18 +28,18 @@ let gameState = {
 
 // College Football Teams Data
 const teams = [
-    { id: 'alabama', name: 'Alabama Crimson Tide', conference: 'SEC', logo: '🐘', colors: ['#A6192E', '#FFFFFF'] },
-    { id: 'georgia', name: 'Georgia Bulldogs', conference: 'SEC', logo: '🐕', colors: ['#BA0C2F', '#000000'] },
-    { id: 'michigan', name: 'Michigan Wolverines', conference: 'Big Ten', logo: '🐺', colors: ['#00274C', '#FFCB05'] },
-    { id: 'ohio-state', name: 'Ohio State Buckeyes', conference: 'Big Ten', logo: '🌰', colors: ['#BB0000', '#FFFFFF'] },
-    { id: 'texas', name: 'Texas Longhorns', conference: 'Big 12', logo: '🤠', colors: ['#BF5700', '#FFFFFF'] },
-    { id: 'oklahoma', name: 'Oklahoma Sooners', conference: 'Big 12', logo: '⚡', colors: ['#841617', '#FDD116'] },
-    { id: 'clemson', name: 'Clemson Tigers', conference: 'ACC', logo: '🐅', colors: ['#F56600', '#522D80'] },
-    { id: 'notre-dame', name: 'Notre Dame Fighting Irish', conference: 'Independent', logo: '☘️', colors: ['#0C2340', '#C99700'] },
-    { id: 'usc', name: 'USC Trojans', conference: 'Pac-12', logo: '⚔️', colors: ['#990000', '#FFCC00'] },
-    { id: 'oregon', name: 'Oregon Ducks', conference: 'Pac-12', logo: '🦆', colors: ['#154733', '#FEE123'] },
-    { id: 'florida', name: 'Florida Gators', conference: 'SEC', logo: '🐊', colors: ['#0021A5', '#FA4616'] },
-    { id: 'lsu', name: 'LSU Tigers', conference: 'SEC', logo: '🐯', colors: ['#461D7C', '#FDD023'] }
+    { id: 'alabama', name: 'Alabama Crimson Tide', conference: 'SEC', logo: 'ALA', colors: ['#A6192E', '#FFFFFF'] },
+    { id: 'georgia', name: 'Georgia Bulldogs', conference: 'SEC', logo: 'UGA', colors: ['#BA0C2F', '#000000'] },
+    { id: 'michigan', name: 'Michigan Wolverines', conference: 'Big Ten', logo: 'MICH', colors: ['#00274C', '#FFCB05'] },
+    { id: 'ohio-state', name: 'Ohio State Buckeyes', conference: 'Big Ten', logo: 'OSU', colors: ['#BB0000', '#FFFFFF'] },
+    { id: 'texas', name: 'Texas Longhorns', conference: 'Big 12', logo: 'TEX', colors: ['#BF5700', '#FFFFFF'] },
+    { id: 'oklahoma', name: 'Oklahoma Sooners', conference: 'Big 12', logo: 'OU', colors: ['#841617', '#FDD116'] },
+    { id: 'clemson', name: 'Clemson Tigers', conference: 'ACC', logo: 'CLEM', colors: ['#F56600', '#522D80'] },
+    { id: 'notre-dame', name: 'Notre Dame Fighting Irish', conference: 'Independent', logo: 'ND', colors: ['#0C2340', '#C99700'] },
+    { id: 'usc', name: 'USC Trojans', conference: 'Pac-12', logo: 'USC', colors: ['#990000', '#FFCC00'] },
+    { id: 'oregon', name: 'Oregon Ducks', conference: 'Pac-12', logo: 'ORE', colors: ['#154733', '#FEE123'] },
+    { id: 'florida', name: 'Florida Gators', conference: 'SEC', logo: 'FLA', colors: ['#0021A5', '#FA4616'] },
+    { id: 'lsu', name: 'LSU Tigers', conference: 'SEC', logo: 'LSU', colors: ['#461D7C', '#FDD023'] }
 ];
 
 // Initialize the game
@@ -89,7 +89,7 @@ function populateTeamGrid() {
         teamCard.onclick = () => selectTeam(team);
         
         teamCard.innerHTML = `
-            <div class="team-logo-placeholder">${team.logo}</div>
+            <div class="team-logo-placeholder" style="background: linear-gradient(45deg, ${team.colors[0]}, ${team.colors[1] || team.colors[0]}); color: ${team.colors[1] || '#FFFFFF'}; font-weight: bold; font-size: 1.2rem;">${team.logo}</div>
             <h3>${team.name}</h3>
             <p>${team.conference}</p>
         `;
@@ -105,13 +105,17 @@ function selectTeam(team) {
     });
     
     // Select new team
-    event.target.closest('.team-card').classList.add('selected');
+    const selectedCard = event.target.closest('.team-card');
+    selectedCard.classList.add('selected');
     gameState.selectedTeam = team;
+    
+    // Add loading feedback
+    selectedCard.innerHTML += '<div style="margin-top: 1rem; color: #28a745; font-weight: bold;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
     
     // Start the game after a short delay
     setTimeout(() => {
         startGame();
-    }, 1000);
+    }, 1500);
 }
 
 function startGame() {
@@ -131,7 +135,10 @@ function startGame() {
 function updateDashboard() {
     // Update team info
     document.getElementById('team-name').textContent = gameState.selectedTeam.name;
-    document.getElementById('team-logo').innerHTML = gameState.selectedTeam.logo;
+    const teamLogo = document.getElementById('team-logo');
+    teamLogo.innerHTML = gameState.selectedTeam.logo;
+    teamLogo.style.background = `linear-gradient(45deg, ${gameState.selectedTeam.colors[0]}, ${gameState.selectedTeam.colors[1] || gameState.selectedTeam.colors[0]})`;
+    teamLogo.style.color = gameState.selectedTeam.colors[1] || '#FFFFFF';
     document.getElementById('team-record').textContent = 
         `${gameState.record.wins}-${gameState.record.losses} (Conference: ${gameState.record.confWins}-${gameState.record.confLosses})`;
     
@@ -241,6 +248,21 @@ function simulateNextGame() {
     const currentGame = gameState.schedule[gameState.gameWeek - 1];
     if (!currentGame || currentGame.played) return;
     
+    // Add visual feedback
+    const simulateBtn = document.getElementById('simulate-btn');
+    simulateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Simulating Game...';
+    simulateBtn.disabled = true;
+    
+    // Simulate game after short delay for suspense
+    setTimeout(() => {
+        runGameSimulation(currentGame);
+        simulateBtn.innerHTML = '<i class="fas fa-fast-forward"></i> Simulate Next Game';
+        simulateBtn.disabled = false;
+    }, 2000);
+}
+
+function runGameSimulation(currentGame) {
+    
     // Calculate team strengths
     const playerStrength = gameState.teamStats.overall;
     const opponentStrength = Math.floor(Math.random() * 30) + 60; // Random opponent strength 60-90
@@ -249,9 +271,13 @@ function simulateNextGame() {
     const homeAdvantage = currentGame.isHome ? 3 : 0;
     const adjustedPlayerStrength = playerStrength + homeAdvantage;
     
-    // Simulate the game
-    const playerScore = Math.floor(Math.random() * 35) + Math.floor(adjustedPlayerStrength / 3);
-    const opponentScore = Math.floor(Math.random() * 35) + Math.floor(opponentStrength / 3);
+    // More realistic scoring simulation
+    const playerScoreBase = Math.floor(adjustedPlayerStrength / 4) + Math.floor(Math.random() * 21); // 0-20 random + strength
+    const opponentScoreBase = Math.floor(opponentStrength / 4) + Math.floor(Math.random() * 21);
+    
+    // Add some variance for exciting games
+    const playerScore = Math.max(0, playerScoreBase + (Math.random() > 0.8 ? Math.floor(Math.random() * 14) : 0));
+    const opponentScore = Math.max(0, opponentScoreBase + (Math.random() > 0.8 ? Math.floor(Math.random() * 14) : 0));
     
     const won = playerScore > opponentScore;
     
@@ -307,15 +333,29 @@ function showGameResult(game) {
         document.getElementById('home-score').textContent = game.playerScore;
         document.getElementById('away-team').textContent = game.opponent.name;
         document.getElementById('away-score').textContent = game.opponentScore;
-        document.getElementById('home-logo').innerHTML = gameState.selectedTeam.logo;
-        document.getElementById('away-logo').innerHTML = game.opponent.logo;
+        const homeLogo = document.getElementById('home-logo');
+        homeLogo.innerHTML = gameState.selectedTeam.logo;
+        homeLogo.style.background = `linear-gradient(45deg, ${gameState.selectedTeam.colors[0]}, ${gameState.selectedTeam.colors[1] || gameState.selectedTeam.colors[0]})`;
+        homeLogo.style.color = gameState.selectedTeam.colors[1] || '#FFFFFF';
+        
+        const awayLogo = document.getElementById('away-logo');
+        awayLogo.innerHTML = game.opponent.logo;
+        awayLogo.style.background = `linear-gradient(45deg, ${game.opponent.colors[0]}, ${game.opponent.colors[1] || game.opponent.colors[0]})`;
+        awayLogo.style.color = game.opponent.colors[1] || '#FFFFFF';
     } else {
         document.getElementById('home-team').textContent = game.opponent.name;
         document.getElementById('home-score').textContent = game.opponentScore;
         document.getElementById('away-team').textContent = gameState.selectedTeam.name;
         document.getElementById('away-score').textContent = game.playerScore;
-        document.getElementById('home-logo').innerHTML = game.opponent.logo;
-        document.getElementById('away-logo').innerHTML = gameState.selectedTeam.logo;
+        const homeLogo = document.getElementById('home-logo');
+        homeLogo.innerHTML = game.opponent.logo;
+        homeLogo.style.background = `linear-gradient(45deg, ${game.opponent.colors[0]}, ${game.opponent.colors[1] || game.opponent.colors[0]})`;
+        homeLogo.style.color = game.opponent.colors[1] || '#FFFFFF';
+        
+        const awayLogo = document.getElementById('away-logo');
+        awayLogo.innerHTML = gameState.selectedTeam.logo;
+        awayLogo.style.background = `linear-gradient(45deg, ${gameState.selectedTeam.colors[0]}, ${gameState.selectedTeam.colors[1] || gameState.selectedTeam.colors[0]})`;
+        awayLogo.style.color = gameState.selectedTeam.colors[1] || '#FFFFFF';
     }
     
     // Game stats
